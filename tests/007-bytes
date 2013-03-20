@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Check that the byte counter counts.
+
+dd if=/dev/zero bs=100 count=1 2>/dev/null \
+| LANG=C $PROG -f -b >/dev/null 2>$TMP1
+NUM=`tr '\r' '\n' < $TMP1 | tr -d ' '`
+test "$NUM" = "100B"
+
+# EOF

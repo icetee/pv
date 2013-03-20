@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Check that the progress bar moves when data is coming in.
+
+dd if=/dev/zero bs=100 count=1 2>/dev/null \
+| $PROG -f -p -i 0.1 -L 500 >/dev/null 2>$TMP1
+
+# There should be more than 2 different lines of output.
+#
+NUM=`tr '\r' '\n' < $TMP1 | sort | uniq -u | wc -l | tr -d ' '`
+test $NUM -gt 2
+
+# EOF

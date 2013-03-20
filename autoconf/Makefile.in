@@ -1,0 +1,14 @@
+#
+# Files from which this is generated (inside directory `autoconf/make'):
+#
+#   package.mk          # package name and distribution details
+#   vars.mk             # compilation, shell and linking variables
+#   filelist.mk~        # lists of files
+#   unreal.mk           # phony targets
+#   modules.mk~         # module linking rules
+#   rules.mk            # compilation rules
+#   link.mk             # real top-level targets
+#   depend.mk~          # dependencies
+#
+#
+

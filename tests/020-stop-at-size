@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Make sure -S stops at the given size.
+
+rm -f $TMP1 $TMP2 2>/dev/null
+
+# exit on non-zero return codes
+set -e
+
+# generate some data
+dd if=/dev/urandom of=$TMP1 bs=1024 count=10 2>/dev/null
+
+# read through pv and test afterwards
+$PROG -S -s 5120 -q $TMP1 > $TMP2
+
+CKSUM2=`cksum $TMP2 | awk '{print $1}'`
+
+# take the first 5120 bytes of TMP1 and cksum them
+rm -f $TMP2
+dd if=$TMP1 of=$TMP2 bs=1024 count=5 2>/dev/null
+CKSUM1=`cksum $TMP2 | awk '{print $1}'`
+
+test "x$CKSUM1" = "x$CKSUM2"
+
+# clean up
+rm -f $TMP1 $TMP2 2>/dev/null
+
+# EOF

@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Try repeatedly messaging a transfer process, and make sure the data stays
+# intact.
+
+# Do nothing if IPC is not supported.
+if ! $PROG -h | grep -Eq "^  -R,"; then
+	echo "SKIPPED" | tr "\n" ' '
+	exit 0
+fi
+
+rm -f $TMP1 $TMP2 $TMP3 $TMP4 2>/dev/null
+
+# Exit on non-zero return codes.
+set -e
+
+# Generate some data.
+dd if=/dev/urandom of=$TMP1 bs=1024 count=10240 2>/dev/null
+
+# Run a few remote control commands in the background.
+#
+echo FAIL > $TMP3
+(
+set +e
+sleep 2
+for x in 1 2 3; do
+	$PROG -R `cat $TMP4` -apterb	|| exit 1
+	usleep 200000 || sleep 1
+	$PROG -R `cat $TMP4` -p		|| exit 1
+	usleep 200000 || sleep 1
+	$PROG -R `cat $TMP4` -N "test"	|| exit 1
+	usleep 200000 || sleep 1
+	$PROG -R `cat $TMP4` -F "%e"	|| exit 1
+	usleep 200000 || sleep 1
+	$PROG -R `cat $TMP4` -N "."	|| exit 1
+	usleep 200000 || sleep 1
+done
+$PROG -R `cat $TMP4` -L 10M
+echo OK > $TMP3
+) &
+
+# Run our data transfer.
+$PROG -L 100k -i 0.1 -f -P $TMP4 $TMP1 > $TMP2 2>/dev/null
+
+# Check our remote control calls ran OK.
+BGSTATUS=`cat $TMP3`
+test "x$BGSTATUS" = "xOK"
+
+# Check data integrity.
+CKSUM1=`cksum $TMP1 | awk '{print $1}'`
+CKSUM2=`cksum $TMP2 | awk '{print $1}'`
+test "x$CKSUM1" = "x$CKSUM2"
+
+# EOF

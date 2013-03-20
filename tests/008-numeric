@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Check that numeric output outputs some percentages.
+
+# Process 100 bytes at 100 bytes per second, updating every 0.1 seconds for
+# around 10 output lines.
+#
+dd if=/dev/zero bs=100 count=1 2>/dev/null \
+| $PROG -s 100 -n -i 0.1 -L 100 >/dev/null 2>$TMP1
+
+# The number of output lines should be >8 and <13, and the final percentage
+# should be 100.
+#
+test `wc -l < $TMP1` -gt 8
+test `wc -l < $TMP1` -lt 13
+test `sed -n '$p' < $TMP1` -eq 100
+
+# EOF

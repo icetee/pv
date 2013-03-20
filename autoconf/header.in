@@ -1,0 +1,89 @@
+/*!NOINDEX*/
+/* Define if you have standard C headers. */
+#undef STDC_HEADERS
+
+/* Define if you have "config.h" (yes, you have). */
+#undef HAVE_CONFIG_H
+
+/* Various other header files. */
+#undef HAVE_GETOPT_H
+#undef HAVE_LIMITS_H
+#undef HAVE_SYS_IPC_H
+#undef HAVE_SYS_PARAM_H
+#undef HAVE_LIBGEN_H
+
+/* Functions. */
+#undef HAVE_GETOPT
+#undef HAVE_GETOPT_LONG
+#undef HAVE_MEMCPY
+#undef HAVE_BASENAME
+#undef HAVE_SNPRINTF
+#undef HAVE_STAT64
+
+#undef HAVE_SPLICE
+#ifdef HAVE_SPLICE
+# define _GNU_SOURCE 1
+#endif
+/* NB the above must come before NLS, as NLS includes other system headers. */
+
+/* NLS stuff. */
+#undef ENABLE_NLS
+#undef HAVE_LIBINTL_H
+#undef HAVE_LOCALE_H
+#undef HAVE_GETTEXT
+#ifdef ENABLE_NLS
+# include "library/gettext.h"
+#else
+# define _(String) (String)
+# define N_(String) (String)
+#endif
+
+/* The name of the program. */
+#define PROGRAM_NAME	"progname"
+
+/* The name of the package. */
+#define PACKAGE		""
+
+/* The current package version. */
+#define VERSION		"0.0.0"
+
+/* Various identification and legal stuff. */
+#define COPYRIGHT_YEAR   _("2012")
+#define COPYRIGHT_HOLDER _("Andrew Wood <andrew.wood@ivarch.com>")
+#define PROJECT_HOMEPAGE "http://www.ivarch.com/programs/" PROGRAM_NAME ".shtml"
+#define BUG_REPORTS_TO   _("Andrew Wood <andrew.wood@ivarch.com>")
+
+/* LFS support. */
+#undef ENABLE_LARGEFILE
+#ifdef ENABLE_LARGEFILE
+# define __USE_LARGEFILE64 1
+# define _LARGEFILE64_SOURCE 1
+#else
+/*
+ * Some Macs have stat64 despite not having open64 while others don't have
+ * either, so here even if we don't have open64 or LFS is disabled, we have
+ * to check whether stat64 exists and only redefine it if it doesn't
+ * otherwise some Macs fail to compile.
+ */
+# ifdef __APPLE__
+#  ifndef HAVE_STAT64
+#   define stat64 stat
+#   define fstat64 fstat
+#  endif
+# else
+#  define stat64 stat
+#  define fstat64 fstat
+# endif
+# define open64 open
+# define lseek64 lseek
+#endif
+
+#undef HAVE_IPC
+#ifdef HAVE_SYS_IPC_H
+#define HAVE_IPC 1
+#endif
+
+/* Support for debugging output. */
+#undef ENABLE_DEBUGGING
+
+/* EOF */

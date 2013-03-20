@@ -1,0 +1,20 @@
+#
+# Dependencies.
+#
+
+src/pv/number.d src/pv/number.o: src/pv/number.c src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/file.d src/pv/file.o: src/pv/file.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/state.d src/pv/state.o: src/pv/state.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/display.d src/pv/display.o: src/pv/display.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/signal.d src/pv/signal.o: src/pv/signal.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/loop.d src/pv/loop.o: src/pv/loop.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/cursor.d src/pv/cursor.o: src/pv/cursor.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/pv/transfer.d src/pv/transfer.o: src/pv/transfer.c src/include/pv-internal.h src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/main/debug.d src/main/debug.o: src/main/debug.c src/include/config.h src/include/library/gettext.h src/include/pv.h 
+src/main/help.d src/main/help.o: src/main/help.c src/include/config.h src/include/library/gettext.h 
+src/main/options.d src/main/options.o: src/main/options.c src/include/config.h src/include/library/gettext.h src/include/options.h src/include/library/getopt.h src/include/pv.h 
+src/main/main.d src/main/main.o: src/main/main.c src/include/config.h src/include/library/gettext.h src/include/options.h src/include/pv.h 
+src/main/remote.d src/main/remote.o: src/main/remote.c src/include/config.h src/include/library/gettext.h src/include/options.h src/include/pv.h 
+src/main/version.d src/main/version.o: src/main/version.c src/include/config.h src/include/library/gettext.h 
+src/library/getopt.d src/library/getopt.o: src/library/getopt.c src/include/config.h src/include/library/gettext.h 
+src/library/gettext.d src/library/gettext.o: src/library/gettext.c src/include/config.h src/include/library/gettext.h 

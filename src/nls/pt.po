@@ -1,0 +1,359 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-22 23:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/pv/file.c:123
+#, fuzzy
+msgid "failed to seek to start of output"
+msgstr "erro obtendo informações do arquivo de saída"
+
+#: src/pv/file.c:223
+msgid "failed to close file"
+msgstr "erro fechando o arquivo"
+
+#: src/pv/file.c:247
+msgid "failed to read file"
+msgstr "erro lendo o arquivo"
+
+#: src/pv/file.c:258
+msgid "failed to stat file"
+msgstr "erro obtendo informações do arquivo"
+
+#: src/pv/file.c:268
+msgid "failed to stat output file"
+msgstr "erro obtendo informações do arquivo de saída"
+
+#: src/pv/file.c:292
+msgid "input file is output file"
+msgstr "os arquivos de entrada e saída são o mesmo"
+
+#: src/pv/state.c:32
+msgid "none"
+msgstr ""
+
+#: src/pv/display.c:94
+msgid "yzafpnum kMGTPEZY"
+msgstr ""
+
+#: src/pv/display.c:458 src/pv/transfer.c:447
+msgid "buffer allocation failed"
+msgstr "erro alocando o buffer"
+
+#: src/pv/display.c:515 src/pv/transfer.c:273
+msgid "B"
+msgstr ""
+
+#: src/pv/display.c:538 src/pv/display.c:546
+msgid "/s"
+msgstr ""
+
+#: src/pv/display.c:538 src/pv/display.c:546
+msgid "B/s"
+msgstr "B/s"
+
+#: src/pv/display.c:565
+msgid "ETA"
+msgstr "ETA"
+
+#: src/pv/cursor.c:56
+#, fuzzy
+msgid "failed to get terminal name"
+msgstr "erro abrindo o terminal"
+
+#: src/pv/cursor.c:99
+#, fuzzy
+msgid "failed to open lock file"
+msgstr "erro fechando o arquivo"
+
+#: src/pv/cursor.c:133
+msgid "lock attempt failed"
+msgstr ""
+
+#: src/pv/cursor.c:355
+msgid "failed to open terminal"
+msgstr "erro abrindo o terminal"
+
+#: src/pv/transfer.c:151
+msgid "read failed"
+msgstr "erro de leitura"
+
+#: src/pv/transfer.c:170
+msgid "warning: read errors detected"
+msgstr ""
+
+#: src/pv/transfer.c:186
+msgid "file is not seekable"
+msgstr ""
+
+#: src/pv/transfer.c:250
+#, fuzzy
+msgid "failed to seek past error"
+msgstr "erro obtendo informações do arquivo"
+
+#: src/pv/transfer.c:271
+msgid "skipped past read error"
+msgstr ""
+
+#: src/pv/transfer.c:398
+msgid "write failed"
+msgstr "erro de gravação"
+
+#: src/pv/transfer.c:535
+msgid "select call failed"
+msgstr "erro na chamada da função select"
+
+#: src/main/help.c:33
+msgid "show progress bar"
+msgstr "exibe barra de progressão"
+
+#: src/main/help.c:35
+msgid "show elapsed time"
+msgstr "exibe tempo passado"
+
+#: src/main/help.c:37
+msgid "show estimated time of arrival (completion)"
+msgstr "exibe o tempo estimado de término"
+
+#: src/main/help.c:39
+msgid "show data transfer rate counter"
+msgstr "exibe a taxa de transferência"
+
+#: src/main/help.c:41
+msgid "show data transfer average rate counter"
+msgstr ""
+
+#: src/main/help.c:43
+msgid "show number of bytes transferred"
+msgstr "exibe a quantidade de bytes transferidos"
+
+#: src/main/help.c:44
+msgid "FORMAT"
+msgstr ""
+
+#: src/main/help.c:45
+msgid "set output format to FORMAT"
+msgstr ""
+
+#: src/main/help.c:47
+msgid "output percentages, not visual information"
+msgstr "exibe apenas as porcentagens, sem informações visuais"
+
+#: src/main/help.c:49
+msgid "do not output any transfer information at all"
+msgstr "executa programa sem exibir quaisquer informações"
+
+#: src/main/help.c:52
+msgid "display nothing until first byte transferred"
+msgstr "não exibe nada até iniciar o processamento"
+
+#: src/main/help.c:53
+msgid "SIZE"
+msgstr ""
+
+#: src/main/help.c:54
+msgid "set estimated data size to SIZE bytes"
+msgstr "seta a quantidade estimada de dados em SIZE bytes"
+
+#: src/main/help.c:56
+msgid "count lines instead of bytes"
+msgstr ""
+
+#: src/main/help.c:57
+msgid "SEC"
+msgstr ""
+
+#: src/main/help.c:58
+msgid "update every SEC seconds"
+msgstr "atualiza informações a cada SEC segundos"
+
+#: src/main/help.c:59
+msgid "WIDTH"
+msgstr ""
+
+#: src/main/help.c:60
+msgid "assume terminal is WIDTH characters wide"
+msgstr "assume que terminal possui WIDTH caracteres de largura"
+
+#: src/main/help.c:61
+msgid "HEIGHT"
+msgstr ""
+
+#: src/main/help.c:62
+msgid "assume terminal is HEIGHT rows high"
+msgstr "assume que terminal possui WIDTH caracteres de largura"
+
+#: src/main/help.c:63
+msgid "NAME"
+msgstr ""
+
+#: src/main/help.c:64
+msgid "prefix visual information with NAME"
+msgstr "exibe NAME antes das demais informações"
+
+#: src/main/help.c:66
+msgid "output even if standard error is not a terminal"
+msgstr "gera dados mesmo que a saída de erro seja redirecionada"
+
+#: src/main/help.c:68
+msgid "use cursor positioning escape sequences"
+msgstr "utiliza caracteres de escape para posicionar o cursor"
+
+#: src/main/help.c:70
+msgid "RATE"
+msgstr ""
+
+#: src/main/help.c:71
+msgid "limit transfer to RATE bytes per second"
+msgstr "limita a transferência a RATE bytes por segundo"
+
+#: src/main/help.c:72
+msgid "BYTES"
+msgstr ""
+
+#: src/main/help.c:73
+msgid "use a buffer size of BYTES"
+msgstr ""
+
+#: src/main/help.c:75
+msgid "skip read errors in input"
+msgstr ""
+
+#: src/main/help.c:77
+#, fuzzy
+msgid "stop after --size bytes have been transferred"
+msgstr "exibe a quantidade de bytes transferidos"
+
+#: src/main/help.c:79
+msgid "PID"
+msgstr ""
+
+#: src/main/help.c:80
+msgid "update settings of process PID"
+msgstr ""
+
+#: src/main/help.c:83
+msgid "FILE"
+msgstr ""
+
+#: src/main/help.c:84
+msgid "save process ID in FILE"
+msgstr ""
+
+#: src/main/help.c:87
+msgid "show this help and exit"
+msgstr "exibe esta tela de ajuda e termina"
+
+#: src/main/help.c:89
+msgid "show version information and exit"
+msgstr "exibe a versão e termina"
+
+#: src/main/help.c:95
+#, c-format
+msgid "Usage: %s [OPTION] [FILE]..."
+msgstr "Uso: %s [OPÇÕES] [ARQUIVOS]..."
+
+#: src/main/help.c:99
+msgid ""
+"Concatenate FILE(s), or standard input, to standard output,\n"
+"with monitoring."
+msgstr ""
+"Concatena ARQUIVO(s) ou a entrada padrão e grava na saída padrão,\n"
+"com monitoramento."
+
+#: src/main/help.c:189
+msgid ""
+"Debugging is enabled; export the DEBUG environment variable to define the\n"
+"output filename.\n"
+msgstr ""
+
+#: src/main/help.c:193
+#, c-format
+msgid "Please report any bugs to %s."
+msgstr "Por favor, reporte quaisquer defeitos para %s."
+
+#. RATS: ignore
+#: src/main/options.c:89
+#, c-format
+msgid "%s: option structure allocation failed (%s)"
+msgstr "%s: erro na alocação da estrutura de opções (%s)"
+
+#: src/main/options.c:102
+#, c-format
+msgid "%s: option structure argv allocation failed (%s)"
+msgstr "%s: erro na alocação da estrutura de opções argv (%s)"
+
+#: src/main/options.c:137
+msgid "integer argument expected"
+msgstr ""
+
+#: src/main/options.c:146
+msgid "numeric argument expected"
+msgstr ""
+
+#. RATS: ignore (OK)
+#: src/main/options.c:252
+#, c-format
+msgid "Try `%s --help' for more information."
+msgstr "Tente `%s --help' para maiores informações."
+
+#. RATS: ignore (OK)
+#: src/main/options.c:256
+#, fuzzy, c-format
+msgid "Try `%s -h' for more information."
+msgstr "Tente `%s -h' para maiores informações."
+
+#: src/main/main.c:75
+#, fuzzy
+msgid "state allocation failed"
+msgstr "erro alocando o buffer"
+
+#: src/main/remote.c:214
+msgid "message not received"
+msgstr ""
+
+#: src/main/remote.c:318
+msgid "IPC not supported on this system"
+msgstr ""
+
+#: src/main/version.c:19
+#, c-format
+msgid "%s %s - Copyright(C) %s %s"
+msgstr "%s %s - Copyright(C) %s %s"
+
+#: src/main/version.c:22
+#, c-format
+msgid "Web site: %s"
+msgstr "Site: %s"
+
+#: src/main/version.c:26
+msgid ""
+"This program is free software, and is being distributed under the\n"
+"terms of the Artistic License 2.0."
+msgstr ""
+"Este programa é um software livre, distribuído sob os termos da\n"
+"Licença Artística."
+
+#: src/main/version.c:31
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+msgstr ""
+"Este programa é distribuído com o intuito de que seja útil,\n"
+"porém SEM QUAISQUER GARANTIAS; sem inclusive as garantias implícitas de\n"
+"COMERCIALIZAÇÃO e ADEQUAÇÃO A OBJETIVOS PARTICULARES."
+
+#~ msgid "failed to lock terminal"
+#~ msgstr "erro abrindo o terminal"

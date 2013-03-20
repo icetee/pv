@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Check that numeric output gives a timer when used with -t.
+
+# Process 100 bytes at 100 bytes per second, updating every 0.1 seconds for
+# around 10 output lines.
+#
+dd if=/dev/zero bs=100 count=1 2>/dev/null \
+| $PROG -s 100 -n -t -i 0.1 -L 100 >/dev/null 2>$TMP1
+
+# The number of output lines should be >8 and <13, and the number of
+# different elapsed times should be at least 7. The last percentage should
+# be 100.
+#
+test `wc -l < $TMP1` -gt 8
+test `wc -l < $TMP1` -lt 13
+test `awk '{print int(10*$1)}' < "$TMP1" | sort -n | uniq | wc -l` -gt 7
+test `sed -n '$p' < $TMP1 | awk '{print $2}'` -eq 100
+
+# EOF

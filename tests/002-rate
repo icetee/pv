@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# A simple test of rate limiting.
+
+# Transfer 102 bytes at 100 bytes/sec. It should take at least 1 second.
+#
+START=`date +%S`
+dd if=/dev/zero bs=102 count=1 2>/dev/null | $PROG -L 100 2>/dev/null | cat >/dev/null
+END=`date +%S`
+
+test $START -ne $END
+
+# EOF

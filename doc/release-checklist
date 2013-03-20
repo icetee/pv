@@ -1,0 +1,20 @@
+Before releasing a new version, go through this checklist:
+
+  - check for patches from http://packages.qa.debian.org/p/pv.html
+  - bump doc/VERSION
+  - bump doc/lsm.in
+  - check doc/NEWS is up to date
+  - check doc/spec.in is up to date (changelog)
+  - check manual is up to date
+  - make indent indentclean
+  - make update-po
+  - make test
+  - commit to SVN
+  - wipe build directory, re-run generate.sh and configure
+  - make release
+  - make manhtml | tidy -asxhtml | sed -e '1,/<body>/d' -e '/<\/body>/,$d'
+  - update HTML for todo and news
+  - copy and sign tar.gz to HTML directory
+  - submit new release to Freecode
+  - upload HTML
+  - check validator results for project page and manual

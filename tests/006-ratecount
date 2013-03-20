@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Check that the transfer rate counter changes.
+
+# Transfer 200 bytes as two 100-byte blocks with a 2-second gap between.
+#
+(dd if=/dev/zero bs=100 count=1 2>/dev/null;
+ sleep 2;
+ dd if=/dev/zero bs=100 count=1 2>/dev/null;
+) | $PROG -f -i 0.5 -r >/dev/null 2>$TMP1
+
+# Count the number of different rates output.
+#
+NUM=`tr '\r' '\n' < $TMP1 | sort | uniq -u | wc -l | tr -d ' '`
+
+# There should be more than 2 different rates counted (around 100 bytes/sec
+# for the each block, 0 bytes/sec for the gap in the middle, and around 50
+# bytes/sec for the average time reported at the end).
+#
+test $NUM -gt 2
+
+# EOF

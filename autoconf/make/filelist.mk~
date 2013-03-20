@@ -1,0 +1,59 @@
+# Automatically generated file listings
+#
+# Creation time: Tue Jan 22 23:30:34 GMT 2013
+
+allsrc = src/pv/number.c \
+src/pv/file.c \
+src/pv/state.c \
+src/pv/display.c \
+src/pv/signal.c \
+src/pv/loop.c \
+src/pv/cursor.c \
+src/pv/transfer.c \
+src/main/debug.c \
+src/main/help.c \
+src/main/options.c \
+src/main/main.c \
+src/main/remote.c \
+src/main/version.c \
+src/library/getopt.c \
+src/library/gettext.c
+
+allobj = src/pv/number.o \
+src/pv/file.o \
+src/pv/state.o \
+src/pv/display.o \
+src/pv/signal.o \
+src/pv/loop.o \
+src/pv/cursor.o \
+src/pv/transfer.o \
+src/main/debug.o \
+src/main/help.o \
+src/main/options.o \
+src/main/main.o \
+src/main/remote.o \
+src/main/version.o \
+src/library/getopt.o \
+src/library/gettext.o \
+src/pv.o \
+src/nls.o \
+src/main.o \
+src/library.o
+
+alldep = src/pv/number.d \
+src/pv/file.d \
+src/pv/state.d \
+src/pv/display.d \
+src/pv/signal.d \
+src/pv/loop.d \
+src/pv/cursor.d \
+src/pv/transfer.d \
+src/main/debug.d \
+src/main/help.d \
+src/main/options.d \
+src/main/main.d \
+src/main/remote.d \
+src/main/version.d \
+src/library/getopt.d \
+src/library/gettext.d
+

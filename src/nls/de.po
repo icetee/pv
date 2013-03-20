@@ -1,0 +1,365 @@
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-22 23:28+0000\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Date: 1999-06-01 15:18:29+0100\n"
+"From: Andrew Wood <ivarch@ubik>\n"
+"Xgettext-Options: --default-domain=pkgbuild --directory=./.pkgdir --add-"
+"comments --keyword=_ --keyword=N_\n"
+"Files: src/getopt/getopt.c src/getopt/getopt1.c src/version.c src/main/init."
+"c src/main/help.c src/main/xpmptr.c src/guts/load.c src/guts/stop.c src/guts/"
+"configure.c src/guts/make.c src/guts/install.c src/guts/prefs.c src/ui/"
+"generate.c src/ui/main.c src/ui/xpm.c src/ui/status.c src/ui/activate.c src/"
+"ui/handlers/main.c src/ui/handlers/package.c src/ui/handlers/prefs.c src/ui/"
+"handlers/dirsel.c src/ui/handlers/popup.c src/ui/handlers/help.c src/ui/"
+"textout.c src/ui/report.c src/ui/callback.c src/nls/intl/bindtextdom.c src/"
+"nls/intl/dcgettext.c src/nls/intl/dgettext.c src/nls/intl/finddomain.c src/"
+"nls/intl/gettext.c src/nls/intl/loadmsgcat.c src/nls/intl/localealias.c src/"
+"nls/intl/textdomain.c src/nls/intl-cat/cat-compat.c src/nls/intl-gett/intl-"
+"compat.c\n"
+
+#: src/pv/file.c:123
+#, fuzzy
+msgid "failed to seek to start of output"
+msgstr "Dateiinformationen für Ausgabe-Datei konnten nicht gelesen werden"
+
+#: src/pv/file.c:223
+msgid "failed to close file"
+msgstr "Datei konnte nicht geschlossen werden"
+
+#: src/pv/file.c:247
+msgid "failed to read file"
+msgstr "Datei konnte nicht gelesen werden"
+
+#: src/pv/file.c:258
+msgid "failed to stat file"
+msgstr "Dateiinformationen konnten nicht gelesen werden"
+
+#: src/pv/file.c:268
+msgid "failed to stat output file"
+msgstr "Dateiinformationen für Ausgabe-Datei konnten nicht gelesen werden"
+
+#: src/pv/file.c:292
+msgid "input file is output file"
+msgstr "Eingabe-Datei ist Ausgabe-Datei"
+
+#: src/pv/state.c:32
+msgid "none"
+msgstr ""
+
+#: src/pv/display.c:94
+msgid "yzafpnum kMGTPEZY"
+msgstr ""
+
+#: src/pv/display.c:458 src/pv/transfer.c:447
+msgid "buffer allocation failed"
+msgstr "Puffer konnte nicht allokiert werden"
+
+#: src/pv/display.c:515 src/pv/transfer.c:273
+msgid "B"
+msgstr "B"
+
+#: src/pv/display.c:538 src/pv/display.c:546
+msgid "/s"
+msgstr ""
+
+#: src/pv/display.c:538 src/pv/display.c:546
+msgid "B/s"
+msgstr ""
+
+#: src/pv/display.c:565
+msgid "ETA"
+msgstr "ETA"
+
+#: src/pv/cursor.c:56
+#, fuzzy
+msgid "failed to get terminal name"
+msgstr "Terminal konnte nicht geöffnet werden"
+
+#: src/pv/cursor.c:99
+#, fuzzy
+msgid "failed to open lock file"
+msgstr "Datei konnte nicht geschlossen werden"
+
+#: src/pv/cursor.c:133
+msgid "lock attempt failed"
+msgstr ""
+
+#: src/pv/cursor.c:355
+msgid "failed to open terminal"
+msgstr "Terminal konnte nicht geöffnet werden"
+
+#: src/pv/transfer.c:151
+msgid "read failed"
+msgstr "read-Aufruf fehlgeschlagen"
+
+#: src/pv/transfer.c:170
+msgid "warning: read errors detected"
+msgstr ""
+
+#: src/pv/transfer.c:186
+msgid "file is not seekable"
+msgstr ""
+
+#: src/pv/transfer.c:250
+#, fuzzy
+msgid "failed to seek past error"
+msgstr "Dateiinformationen konnten nicht gelesen werden"
+
+#: src/pv/transfer.c:271
+msgid "skipped past read error"
+msgstr ""
+
+#: src/pv/transfer.c:398
+msgid "write failed"
+msgstr "write-Aufruf fehlgeschlagen"
+
+#: src/pv/transfer.c:535
+msgid "select call failed"
+msgstr "select-Aufruf fehlgeschlagen"
+
+#: src/main/help.c:33
+msgid "show progress bar"
+msgstr "Fortschritts-Anzeige"
+
+#: src/main/help.c:35
+msgid "show elapsed time"
+msgstr "zeige die verstrichene Zeit an"
+
+#: src/main/help.c:37
+msgid "show estimated time of arrival (completion)"
+msgstr "zeige die erwartete Zeit bis zum Ende an"
+
+#: src/main/help.c:39
+msgid "show data transfer rate counter"
+msgstr "zeige die Datentransferrate an"
+
+#: src/main/help.c:41
+msgid "show data transfer average rate counter"
+msgstr ""
+
+#: src/main/help.c:43
+msgid "show number of bytes transferred"
+msgstr "zeige die Anzahl von Bytes, die transferiert worden sind"
+
+#: src/main/help.c:44
+msgid "FORMAT"
+msgstr ""
+
+#: src/main/help.c:45
+msgid "set output format to FORMAT"
+msgstr ""
+
+#: src/main/help.c:47
+msgid "output percentages, not visual information"
+msgstr "Ausgabe von Prozent-Angaben statt visueller Darstellung"
+
+#: src/main/help.c:49
+msgid "do not output any transfer information at all"
+msgstr "sämtliche Transferinformationen unterdrücken"
+
+#: src/main/help.c:52
+msgid "display nothing until first byte transferred"
+msgstr "keine Ausgabe bevor das erste Byte übertragen wurde"
+
+#: src/main/help.c:53
+msgid "SIZE"
+msgstr ""
+
+#: src/main/help.c:54
+msgid "set estimated data size to SIZE bytes"
+msgstr "setze erwartete Daten-Länge auf SIZE Byte"
+
+#: src/main/help.c:56
+msgid "count lines instead of bytes"
+msgstr ""
+
+#: src/main/help.c:57
+msgid "SEC"
+msgstr ""
+
+#: src/main/help.c:58
+msgid "update every SEC seconds"
+msgstr "aktualisiere Ausgabe nach SEC Sekunden Intervall"
+
+#: src/main/help.c:59
+msgid "WIDTH"
+msgstr ""
+
+#: src/main/help.c:60
+msgid "assume terminal is WIDTH characters wide"
+msgstr "setze Terminal-Breite auf WIDTH Zeichen"
+
+#: src/main/help.c:61
+msgid "HEIGHT"
+msgstr ""
+
+#: src/main/help.c:62
+msgid "assume terminal is HEIGHT rows high"
+msgstr "setze Terminal-Breite auf WIDTH Zeichen"
+
+#: src/main/help.c:63
+msgid "NAME"
+msgstr ""
+
+#: src/main/help.c:64
+msgid "prefix visual information with NAME"
+msgstr "setze den NAMEn für visuelle Darstellung"
+
+#: src/main/help.c:66
+msgid "output even if standard error is not a terminal"
+msgstr ""
+"Ausgabe auch dann erzwingen, wenn der Fehlerausgabe-Kanal kein Terminal ist"
+
+#: src/main/help.c:68
+msgid "use cursor positioning escape sequences"
+msgstr "benutze Escape-Sequenzen zur Cursor-Positionierung"
+
+#: src/main/help.c:70
+msgid "RATE"
+msgstr ""
+
+#: src/main/help.c:71
+msgid "limit transfer to RATE bytes per second"
+msgstr "beschränke die Transferrate auf RATE Byte pro Sekunde"
+
+#: src/main/help.c:72
+msgid "BYTES"
+msgstr ""
+
+#: src/main/help.c:73
+msgid "use a buffer size of BYTES"
+msgstr ""
+
+#: src/main/help.c:75
+msgid "skip read errors in input"
+msgstr ""
+
+#: src/main/help.c:77
+#, fuzzy
+msgid "stop after --size bytes have been transferred"
+msgstr "zeige die Anzahl von Bytes, die transferiert worden sind"
+
+#: src/main/help.c:79
+msgid "PID"
+msgstr ""
+
+#: src/main/help.c:80
+msgid "update settings of process PID"
+msgstr ""
+
+#: src/main/help.c:83
+msgid "FILE"
+msgstr ""
+
+#: src/main/help.c:84
+msgid "save process ID in FILE"
+msgstr ""
+
+#: src/main/help.c:87
+msgid "show this help and exit"
+msgstr "zeige diese Hilfe und beende"
+
+#: src/main/help.c:89
+msgid "show version information and exit"
+msgstr "zeige Versionsinformationen und beende"
+
+#: src/main/help.c:95
+#, c-format
+msgid "Usage: %s [OPTION] [FILE]..."
+msgstr "Syntax: %s [OPTION] [DATEI]..."
+
+#: src/main/help.c:99
+msgid ""
+"Concatenate FILE(s), or standard input, to standard output,\n"
+"with monitoring."
+msgstr ""
+"Verbindet DATEI(en) oder den Standard-Eingabe-Kanal mit dem\n"
+"Standard-Ausgabe-Kanal und misst den Datenstrom."
+
+#: src/main/help.c:189
+msgid ""
+"Debugging is enabled; export the DEBUG environment variable to define the\n"
+"output filename.\n"
+msgstr ""
+
+#: src/main/help.c:193
+#, c-format
+msgid "Please report any bugs to %s."
+msgstr "Bitte senden Sie Fehlerberichte an %s."
+
+#. RATS: ignore
+#: src/main/options.c:89
+#, c-format
+msgid "%s: option structure allocation failed (%s)"
+msgstr "%s: `option' konnte nicht allokiert werden (%s)"
+
+#: src/main/options.c:102
+#, c-format
+msgid "%s: option structure argv allocation failed (%s)"
+msgstr "%s: `option' (argv) konnte nicht allokiert werden (%s)"
+
+#: src/main/options.c:137
+msgid "integer argument expected"
+msgstr ""
+
+#: src/main/options.c:146
+msgid "numeric argument expected"
+msgstr ""
+
+#. RATS: ignore (OK)
+#: src/main/options.c:252
+#, c-format
+msgid "Try `%s --help' for more information."
+msgstr "`%s --help' zeigt weitere Informationen an."
+
+#. RATS: ignore (OK)
+#: src/main/options.c:256
+#, fuzzy, c-format
+msgid "Try `%s -h' for more information."
+msgstr "`%s -h' zeigt weitere Informationen an."
+
+#: src/main/main.c:75
+#, fuzzy
+msgid "state allocation failed"
+msgstr "Puffer konnte nicht allokiert werden"
+
+#: src/main/remote.c:214
+msgid "message not received"
+msgstr ""
+
+#: src/main/remote.c:318
+msgid "IPC not supported on this system"
+msgstr ""
+
+#: src/main/version.c:19
+#, c-format
+msgid "%s %s - Copyright(C) %s %s"
+msgstr "%s %s - Copyright(C) %s %s"
+
+#: src/main/version.c:22
+#, c-format
+msgid "Web site: %s"
+msgstr "Web-Site: %s"
+
+#: src/main/version.c:26
+msgid ""
+"This program is free software, and is being distributed under the\n"
+"terms of the Artistic License 2.0."
+msgstr ""
+"Dieses Programm ist freie Software und wird unter den Bedingungen\n"
+"der Artistic License verbreitet."
+
+#: src/main/version.c:31
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+msgstr ""
+"Dieses Programm wird verbreitet unter der Annahme dass es nützlich ist,\n"
+"aber OHNE JEGLICHE GARANTIE; insbesondere ohne der impliziten Garantie\n"
+"einer MARKTGÄNGIGKEIT oder EIGNUNG ZU EINEM BESTIMMTEN ZWECK."
+
+#~ msgid "failed to lock terminal"
+#~ msgstr "Terminal konnte nicht geöffnet werden"

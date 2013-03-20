@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Check that data can be just passed straight through.
+
+VALUE=`echo TESTING | $PROG 2>/dev/null` || exit 1
+test "$VALUE" = "TESTING"
+
+# EOF

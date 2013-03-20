@@ -1,0 +1,16 @@
+Things still to do:
+
+  - (#1293) check transfer buffer usage on large memory systems
+  - (#1284) fix install on OSes without man page .gz (Bob Friesenhahn)
+  - (#1286) option for process title (Martin Sarsale) as "pv - name:FooProcess -xyz - transferred: 1.3GB - 500KB/s - running: 10:15:30s"
+  - (#1290) look at effect of O_SYNC or fsync on performance
+  - (#1281) option (-x?) to use xterm title line for status (Joachim Haga)
+  - (#1287) if the first pv exits, should the second become IPC leader?
+
+  - add development support for http://clang.llvm.org/StaticAnalysis.html
+  - stats for avg/min/max/stddev throughput (Venky.N.Iyer)
+  - option to enable O_DIRECT (Romain Kang)
+  - pv-ify a command line (Will Entriken) - "pv FOO | BAR | BAZ"
+  - get more translations
+
+Any assistance would be appreciated.

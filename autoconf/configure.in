@@ -1,0 +1,193 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/main/version.c)
+
+dnl We're using C.
+dnl
+AC_LANG_C
+
+dnl Output a header file.
+dnl
+AC_CONFIG_HEADER(src/include/config.h:autoconf/header.in)
+
+dnl Set directory to check for Configure scripts in.
+dnl
+AC_CONFIG_AUX_DIR(autoconf/scripts)
+
+dnl Read in package details.
+dnl
+PACKAGE=`cat $srcdir/doc/PACKAGE`
+VERSION=`cat $srcdir/doc/VERSION`
+UCPACKAGE=`tr a-z A-Z < $srcdir/doc/PACKAGE`
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
+AC_SUBST(UCPACKAGE)
+AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
+AC_DEFINE_UNQUOTED(PROGRAM_NAME, "$PACKAGE")
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+
+dnl Check for compile-time options.
+dnl
+AC_ARG_ENABLE(debugging,
+  [  --enable-debugging      compile with debugging support],
+  if test "$enable_debugging" = "yes"; then
+  	CFLAGS="-g -Wall"
+	AC_DEFINE(ENABLE_DEBUGGING)
+  fi
+)
+AC_ARG_ENABLE(profiling,
+  [  --enable-profiling      compile with profiling support],
+  if test "$enable_profiling" = "yes"; then
+  	CFLAGS="-pg $CFLAGS"
+  fi
+)
+LFS_SUPPORT="no"
+AC_ARG_ENABLE(lfs, [  --disable-lfs           disable LFS support],
+  if test "$enable_lfs" = "yes"; then
+    LFS_SUPPORT="yes"
+  fi,
+  LFS_SUPPORT="yes"
+)
+STATIC_NLS="no"
+AC_ARG_ENABLE(static-nls, [  --enable-static-nls     hardcode NLS with no support files],
+  if test "$enable_static_nls" = "yes"; then
+    STATIC_NLS="yes"
+  fi,
+  STATIC_NLS="no"
+)
+NLS_SUPPORT="no"
+AC_ARG_ENABLE(nls, [  --disable-nls           do not use Native Language Support],
+  if test "$enable_nls" = "yes"; then
+    NLS_SUPPORT="yes"
+  fi,
+  NLS_SUPPORT="yes"
+)
+SPLICE_SUPPORT="no"
+AC_ARG_ENABLE(splice, [  --disable-splice        do not use splice system call],
+  if test "$enable_splice" = "yes"; then
+    SPLICE_SUPPORT="yes"
+  fi,
+  SPLICE_SUPPORT="yes"
+)
+IPC_SUPPORT="no"
+AC_ARG_ENABLE(ipc, [  --disable-ipc           turn off IPC messaging],
+  if test "$enable_ipc" = "yes"; then
+    IPC_SUPPORT="yes"
+  fi,
+  IPC_SUPPORT="yes"
+)
+
+dnl Check for various programs.
+dnl
+CFLAGS=${CFLAGS:-"-O"}
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_CHECK_PROG(DO_GZIP, gzip, gzip -f9, touch)
+
+dnl NLS stuff.
+dnl
+ALL_LINGUAS="de fr pl pt"
+if test "$NLS_SUPPORT" = "yes"; then
+  AC_DEFINE(ENABLE_NLS)
+  AC_PATH_PROG(MSGFMT, msgfmt, NOMSGFMT)
+  AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
+  AC_PATH_PROG(XGETTEXT, xgettext, xgettext)
+  if test "x$MSGFMT" = "xNOMSGFMT"; then
+    MSGFMT=""
+    STATIC_NLS="yes"
+  fi
+  if test "$STATIC_NLS" = "yes"; then
+    CATALOGS=""
+    NLSOBJ="src/nls/table.o"
+  else
+    AC_CHECK_LIB(intl, main)
+    AC_CHECK_LIB(i, main)
+  fi
+  CATOBJEXT=.mo
+  INSTOBJEXT=.mo
+  for lang in $ALL_LINGUAS; do
+    GMOFILES="$GMOFILES $lang.gmo"
+    POFILES="$POFILES \$(srcdir)/src/nls/$lang.po"
+    CATALOGS="$CATALOGS src/nls/$lang$CATOBJEXT";
+  done
+  if test "$STATIC_NLS" = "yes"; then
+    CATALOGS=""
+  else
+    AC_CHECK_FUNC(gettext,
+     [AC_DEFINE(HAVE_GETTEXT)
+      NLSOBJ=""
+     ], [CATALOGS=""; NLSOBJ="src/nls/table.o"
+     ]
+    )
+  fi
+fi
+AC_CHECK_HEADERS(libintl.h)
+AC_CHECK_HEADERS(locale.h)
+AC_SUBST(MSGFMT)
+AC_SUBST(GMSGFMT)
+AC_SUBST(XGETTEXT)
+AC_SUBST(CATOBJEXT)
+AC_SUBST(INSTOBJEXT)
+AC_SUBST(GMOFILES)
+AC_SUBST(POFILES)
+AC_SUBST(CATALOGS)
+AC_SUBST(NLSOBJ)
+
+dnl Getopt checks.
+dnl
+AC_CHECK_FUNCS(getopt_long getopt)
+AC_CHECK_HEADERS(getopt.h)
+
+dnl LFS checks.
+dnl
+if test "$LFS_SUPPORT" = "yes"; then
+  AC_CHECK_FUNCS(open64, AC_DEFINE(ENABLE_LARGEFILE))
+fi
+
+dnl Check for various header files and set various other macros.
+dnl
+AC_DEFINE(HAVE_CONFIG_H)
+AC_HEADER_STDC
+AC_CHECK_FUNCS(memcpy basename snprintf stat64)
+AC_CHECK_HEADERS(limits.h)
+
+if test "$IPC_SUPPORT" = "yes"; then
+  AC_CHECK_HEADERS(sys/ipc.h sys/param.h libgen.h)
+fi
+
+if test "$SPLICE_SUPPORT" = "yes"; then
+  AC_CHECK_FUNCS(splice)
+fi
+
+test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
+AC_SUBST(INSTALL_DATA)
+
+dnl Fudging for separate build directories.
+dnl
+subdirs=""
+for i in `find $srcdir/src -type d -print | sed s,$srcdir/,,`; do
+  subdirs="$subdirs $i"
+done
+
+dnl Stitch together the Makefile fragments.
+dnl
+mk_segments="autoconf/Makefile.in"
+for i in vars.mk package.mk filelist.mk~ unreal.mk modules.mk~ \
+         rules.mk link.mk depend.mk~; do
+  mk_segments="$mk_segments:autoconf/make/$i"
+done
+
+dnl Output files (and create build directory structure too).
+dnl
+AC_OUTPUT(Makefile:$mk_segments doc/lsm:doc/lsm.in
+          doc/quickref.1:doc/quickref.1.in
+          doc/$PACKAGE.spec:doc/spec.in
+          src/.dummy:doc/NEWS,
+  rm -f src/.dummy
+  for i in $subdirs; do
+    test -d $i || mkdir $i
+  done
+, subdirs="$subdirs")
+
+dnl EOF

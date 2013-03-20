@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Check that numeric output gives a byte count instead of a percentage when
+# used with -b.
+
+# Process 500 bytes at 500 bytes per second, updating every 0.1 seconds for
+# around 10 output lines.
+#
+dd if=/dev/zero bs=500 count=1 2>/dev/null \
+| $PROG -s 500 -n -b -i 0.1 -L 500 >/dev/null 2>$TMP1
+
+# The number of output lines should be >8 and <13, and the final byte count
+# should be 500.
+#
+test `wc -l < $TMP1` -gt 8
+test `wc -l < $TMP1` -lt 13
+test `sed -n '$p' < $TMP1` -eq 500
+
+# EOF

@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Try changing the format of a transfer remotely.
+
+# Do nothing if IPC is not supported.
+if ! $PROG -h | grep -Eq "^  -R,"; then
+	echo "SKIPPED" | tr "\n" ' '
+	exit 0
+fi
+
+rm -f $TMP1 $TMP2 $TMP3 $TMP4 2>/dev/null
+
+# Exit on non-zero return codes.
+set -e
+
+# Generate an empty test file.
+dd if=/dev/zero of=$TMP1 bs=1024 count=10240 2>/dev/null
+
+(
+sleep 1
+$PROG -R `cat $TMP4` -a
+sleep 2
+$PROG -R `cat $TMP4` -L 10M
+) &
+
+$PROG -L 2M -f -P $TMP4 $TMP1 > $TMP2 2>$TMP3
+
+# Make sure there is more than one length of line (excluding blank lines).
+line_lengths=`tr '\r' '\n' < "$TMP3" | awk '{print length($0)}' | grep -Fvx 0 | sort -n | uniq | wc -l`
+test $line_lengths -gt 1
+
+# EOF

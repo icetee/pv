@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Check that the bytes count doesn't increase the line length as it passes
+# 1MiB, described here:
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=586763
+
+# Transfer 1500kB of data in a bursty fashion.
+#
+(dd if=/dev/zero bs=1k count=999;
+ sleep 1;
+ dd if=/dev/zero bs=1k count=1;
+ sleep 1;
+ dd if=/dev/zero bs=1k count=500;
+ sleep 1;
+) 2>/dev/null | ($PROG -btef -s 1500k >/dev/null) 2>$TMP1
+
+# Count how many different line lengths we've seen.
+#
+NUM=`tr '\r' '\n' < $TMP1 | awk '{x=length($0);if(x>0)print length($0)}' | sort | uniq | wc -l`
+
+# There should only be one length (not counting 0).
+#
+test $NUM -eq 1 || { echo; tr '\r' '\n' < $TMP1; exit 1; }
+
+# EOF
