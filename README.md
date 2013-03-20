@@ -29,7 +29,7 @@ Additional support is available for multiple instances working in tandem, to giv
 ####Install
 	./configure
 	make
-	install
+	make install
 
 ####Uninstall
 	make uninstall
