@@ -1,5 +1,5 @@
 # Pipe Viewer - 1.6
-####Current version: 1.6
+#### Current version: 1.6
 
 Pipe Viewer - is a terminal-based tool for monitoring the progress of data through a pipeline. It can be inserted into any normal pipeline between two processes to give a visual indication of how quickly data is passing through, how long it has taken, how near to completion it is, and an estimate of how long it will be until completion.
 
@@ -7,7 +7,7 @@ Additional support is available for multiple instances working in tandem, to giv
 
 ![Screen](http://www.ivarch.com/programs/images/pv.png)
 
-####Packages and ports
+#### Packages and ports
 
 * CentOS / RHEL:  Set up [YUM repository](http://www.ivarch.com/programs/yum.shtml) or use [RepoForge](http://repoforge.org/), then do **"yum install pv"**.
 * Fedora:	Run **"yum install pv"** (the "extras" repository may be required).
@@ -26,27 +26,26 @@ Additional support is available for multiple instances working in tandem, to giv
 * IRIX Nekoware:	Available in the Nekoware "beta" repository. ([Mark Round](http://www.markround.com/))
 * Syabas PopcornHour:	Someone posted t[his port in a forum](http://www.networkedmediatank.com/showthread.php?tid=7192&page=5).
 
-####Install
+#### Install
 	./configure
 	make
 	make install
 
-####Documentation
+#### Documentation
 
 A manual page is included in this distribution.  See 'man ./doc/quickref.1',
 or 'man pv' after installation.
 
-####Uninstall
+#### Uninstall
 	make uninstall
 
-####Author and acknowledgements
+#### Author and acknowledgements
 
 This package is copyright 2015 Andrew Wood, and is being distributed under
 the terms of the Artistic License 2.0.  For more details of this license,
 see the file `doc/COPYING'.
 
-Report bugs in `pv' to pv@ivarch.com or use the contact form linked from the
-home page.
+Report bugs in `pv' to pv@ivarch.com or use the contact form linked from the home page.
 
 The `pv' home page is at:
 
@@ -56,177 +55,177 @@ The latest version can always be found here.
 
 Credit is also due to:
 
-  Jakub Hrozek <jhrozek@redhat.com>
-    - Fedora package maintainer
+Jakub Hrozek <jhrozek@redhat.com>
+- Fedora package maintainer
 
-  Antoine Beaupré <anarcat@debian.org>
-    - Debian package maintainer
+Antoine Beaupré <anarcat@debian.org>
+- Debian package maintainer
 
-  Kevin Coyner <kcoyner@debian.org>
-  Cédric Delfosse <cedric@debian.org>
-    - previous Debian package maintainers
+Kevin Coyner <kcoyner@debian.org>
+Cédric Delfosse <cedric@debian.org>
+- previous Debian package maintainers
 
-  Eduardo Aguiar <eduardo.oliveira@sondabrasil.com.br>
-    - provided Portuguese (Brazilian) translation
+Eduardo Aguiar <eduardo.oliveira@sondabrasil.com.br>
+- provided Portuguese (Brazilian) translation
 
-  Stéphane Lacasse <stephane@gorfou.ca>
-    - provided French translation
+Stéphane Lacasse <stephane@gorfou.ca>
+- provided French translation
 
-  Marcos Kreinacke <public@kreinacke.com>
-    - provided German translation
+Marcos Kreinacke <public@kreinacke.com>
+- provided German translation
 
-  Bartosz Fe�ski <fenio@o2.pl> <http://skawina.eu.org/>
-    - provided Polish translation along with Krystian Zubel
+Bartosz Fenski <fenio@o2.pl> <http://skawina.eu.org/>
+- provided Polish translation along with Krystian Zubel
 
-  Joshua Jensen
-    - reported RPM installation bug
+Joshua Jensen
+- reported RPM installation bug
 
-  Boris Folgmann <http://www.folgmann.com/en/>
-    - reported cursor handling bug
+Boris Folgmann <http://www.folgmann.com/en/>
+- reported cursor handling bug
 
-  Mathias Gumz
-    - reported NLS bug
+Mathias Gumz
+- reported NLS bug
 
-  Daniel Roethlisberger
-    - submitted patch to use lockfiles for -c if terminal locking fails
+Daniel Roethlisberger
+- submitted patch to use lockfiles for -c if terminal locking fails
 
-  Adam Buchbinder
-    - lots of help with a Cygwin port of -c
+Adam Buchbinder
+- lots of help with a Cygwin port of -c
 
-  Mark Tomich <http://metuchen.dyndns.org>
-    - suggested -B option
+Mark Tomich <http://metuchen.dyndns.org>
+- suggested -B option
 
-  Gert Menke
-    - reported bug when piping to dd with a large input buffer size
+Gert Menke
+- reported bug when piping to dd with a large input buffer size
 
-  Ville Herva <Ville.Herva@iki.fi>
-    - informative bug report about rate limiting performance
+Ville Herva <Ville.Herva@iki.fi>
+- informative bug report about rate limiting performance
 
-  Elias Pipping
-    - patch to compile properly on Darwin 9; potential NULL deref report
+Elias Pipping
+- patch to compile properly on Darwin 9; potential NULL deref report
 
-  Patrick Collison
-    - similar patch for OS X
+Patrick Collison
+- similar patch for OS X
 
-  Boris Lohner
-    - reported problem that "-L" does not complain if given non-numeric value
+Boris Lohner
+- reported problem that "-L" does not complain if given non-numeric value
 
-  Sebastian Kayser
-    - supplied testing for SIGPIPE, demonstrated internationalisation problem
+Sebastian Kayser
+- supplied testing for SIGPIPE, demonstrated internationalisation problem
 
-  Laszlo Ersek <http://phptest11.atw.hu/>
-    - reported shared memory leak on SIGINT with -c
+Laszlo Ersek <http://phptest11.atw.hu/>
+- reported shared memory leak on SIGINT with -c
 
-  Phil Rutschman <http://bandgap.rsnsoft.com/>
-    - provided a patch for fully restoring terminal state on exit
+Phil Rutschman <http://bandgap.rsnsoft.com/>
+- provided a patch for fully restoring terminal state on exit
 
-  Henry Precheur <http://henry.precheur.org/>
-    - reporting and suggestions for --rate-limit bug when rate is under 10
+Henry Precheur <http://henry.precheur.org/>
+- reporting and suggestions for --rate-limit bug when rate is under 10
 
-  E. Rosten <http://mi.eng.cam.ac.uk/~er258/>
-    - supplied patch for block buffering in line mode
+E. Rosten <http://mi.eng.cam.ac.uk/~er258/>
+- supplied patch for block buffering in line mode
 
-  Kjetil Torgrim Homme
-    - reported compilation error with default CFLAGS on non-GCC compilers
+Kjetil Torgrim Homme
+- reported compilation error with default CFLAGS on non-GCC compilers
 
-  Alexandre de Verteuil
-    - reported bug in OS X build and supplied test environment to fix in
+Alexandre de Verteuil
+- reported bug in OS X build and supplied test environment to fix in
 
-  Martin Baum
-    - supplied patch to return nonzero exit status if terminated by signal
+Martin Baum
+- supplied patch to return nonzero exit status if terminated by signal
 
-  Sam Nelson <http://www.siliconfuture.net/>
-    - supplied patch to fix trailing slash on DESTDIR
+Sam Nelson <http://www.siliconfuture.net/>
+- supplied patch to fix trailing slash on DESTDIR
 
-  Daniel Pape
-    - reported Cygwin installation problem due to DESTDIR
+Daniel Pape
+- reported Cygwin installation problem due to DESTDIR
 
-  Philipp Beckers
-    - ported to the Syabas PopcornHour A-100 series
+Philipp Beckers
+- ported to the Syabas PopcornHour A-100 series
 
-  Henry Gebhard <hsggebhardt@googlemail.com>
-    - supplied patches to improve SI prefixes and add --average-rate
+Henry Gebhard <hsggebhardt@googlemail.com>
+- supplied patches to improve SI prefixes and add --average-rate
 
-  Vladimir Kokarev, Alexander Leo
-    - reported that exit status did not reflect file errors
+Vladimir Kokarev, Alexander Leo
+- reported that exit status did not reflect file errors
 
-  Thomas Rachel
-    - submitted patches for IEEE1541 (MiB suffixes), 1+e03 bug
+Thomas Rachel
+- submitted patches for IEEE1541 (MiB suffixes), 1+e03 bug
 
-  Guillaume Marcais
-    - submitted speedup patch for line mode
+Guillaume Marcais
+- submitted speedup patch for line mode
 
-  Moritz Barsnick
-    - submitted patch for compile warning in size calculation
+Moritz Barsnick
+- submitted patch for compile warning in size calculation
 
-  Pawel Piatek
-    - submitted RPM and patches for AIX
+Pawel Piatek
+- submitted RPM and patches for AIX
 
-  Sami Liedes
-    - submitted patch for --timer and --bytes with --numeric
+Sami Liedes
+- submitted patch for --timer and --bytes with --numeric
 
-  Steven Willis
-    - reported problem with "-R" killing non-PV remote processes
+Steven Willis
+- reported problem with "-R" killing non-PV remote processes
 
-  Vladimir Pal, Vladimir Ermakov
-    - submitted patch which led to development of --format option
+Vladimir Pal, Vladimir Ermakov
+- submitted patch which led to development of --format option
 
-  Peter Samuelson <peter@p12n.org>
-    - submitted patch to calculate size if stdout is a block device
+Peter Samuelson <peter@p12n.org>
+- submitted patch to calculate size if stdout is a block device
 
-  Miguel Diaz
-    - much Cygwin help (and packaging), found narrow-terminal bug
+Miguel Diaz
+- much Cygwin help (and packaging), found narrow-terminal bug
 
-  Jim Salter <http://ubuntuwiki.net>
-    - commissioned work on the --skip-errors option
+Jim Salter <http://ubuntuwiki.net>
+- commissioned work on the --skip-errors option
 
-  Wouter Pronk
-    - reported build problem on SCO
+Wouter Pronk
+- reported build problem on SCO
 
-  Bryan Dongray <http://www.dongrays.com>
-    - provided patches for test scripts failing on older Red Hats
+Bryan Dongray <http://www.dongrays.com>
+- provided patches for test scripts failing on older Red Hats
 
-  Zev Weiss <www.bewilderbeest.net>
-    - provided patch to fix splice() not using stdin
+Zev Weiss <www.bewilderbeest.net>
+- provided patch to fix splice() not using stdin
 
-  Zing Shishak
-    - provided patch for --null / -0 (count null terminated lines)
+Zing Shishak
+- provided patch for --null / -0 (count null terminated lines)
 
-  Jacek Wielemborek <http://deetah.jogger.pl/kategorie/english>
-    - implemented fdwatch in Python, suggested PV port
-    - reported bug with "-l" and ETA / size
+Jacek Wielemborek <http://deetah.jogger.pl/kategorie/english>
+- implemented fdwatch in Python, suggested PV port
+- reported bug with "-l" and ETA / size
 
-  Kim Krecht
-    - suggested buffer fill status and last bytes output display options
+Kim Krecht
+- suggested buffer fill status and last bytes output display options
 
-  Cristian Ciupitu <http://ciupicri.github.io>, Josh Stone
-    - pointed out file descriptor leak with helpful suggestions
-      (Josh Stone initially noticed the missing close)
+Cristian Ciupitu <http://ciupicri.github.io>, Josh Stone
+- pointed out file descriptor leak with helpful suggestions
+  (Josh Stone initially noticed the missing close)
 
-  Jan Seda
-    - found issue with splice() and SPLICE_F_NONBLOCK causing slowdown
+Jan Seda
+- found issue with splice() and SPLICE_F_NONBLOCK causing slowdown
 
-  André Stapf
-    - pointed out formatting problem e.g. 13GB -> 13.1GB which should be
-      shown 13.0GB -> 13.1GB; highlighted on-startup row swapping in -c
+André Stapf
+- pointed out formatting problem e.g. 13GB -> 13.1GB which should be
+  shown 13.0GB -> 13.1GB; highlighted on-startup row swapping in -c
 
-  Damon Harper <http://www.usrbin.ca/>
-    - suggested "-D" / "--delay-start" option
+Damon Harper <http://www.usrbin.ca/>
+- suggested "-D" / "--delay-start" option
 
-  Ganaël Laplanche <http://www.martymac.org>
-    - provided patch for lstat64 on systems that do not support it
+Ganaël Laplanche <http://www.martymac.org>
+- provided patch for lstat64 on systems that do not support it
 
-  Peter Korsgaard <http://www.buildroot.net/>
-    - provided similar patch for lstat64, specifically for uClibc support
+Peter Korsgaard <http://www.buildroot.net/>
+- provided similar patch for lstat64, specifically for uClibc support
 
-  Ralf Ramsauer <https://blog.ramses-pyramidenbau.de/>
-    - reported bug which dropped transfer rate on terminal resize
+Ralf Ramsauer <https://blog.ramses-pyramidenbau.de/>
+- reported bug which dropped transfer rate on terminal resize
 
-  Michiel Van Herwegen
-    - reported and discussed bug with "-l" and ETA / size
+Michiel Van Herwegen
+- reported and discussed bug with "-l" and ETA / size
 
-  Erkki Seppälä <http://www.inside.org/~flux/>
-    - provided patch implementing "-I"
+Erkki Seppälä <http://www.inside.org/~flux/>
+- provided patch implementing "-I"
 
 ####News
 
