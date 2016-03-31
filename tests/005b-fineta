@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Check that the estimated time counter can show the end time of day.
+
+dd if=/dev/zero bs=100 count=1 2>/dev/null \
+| $PROG -f -I -s 100 -i 0.1 -L 25 >/dev/null 2>$TMP1
+
+# Count the number of different ETA values there have been.
+#
+NUM=`tr '\r' '\n' < $TMP1 | tr -d ' ' | sed '/^$/d' | sort | uniq | wc -l | tr -d ' '`
+
+# There should be at least 1 line of output.
+#
+test $NUM -gt 0 || exit 1
+
+# 8 or more different values - not OK.
+#
+test $NUM -lt 8
+
+# EOF

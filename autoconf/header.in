@@ -48,10 +48,10 @@
 #define VERSION		"0.0.0"
 
 /* Various identification and legal stuff. */
-#define COPYRIGHT_YEAR   _("2012")
+#define COPYRIGHT_YEAR   _("2015")
 #define COPYRIGHT_HOLDER _("Andrew Wood <andrew.wood@ivarch.com>")
 #define PROJECT_HOMEPAGE "http://www.ivarch.com/programs/" PROGRAM_NAME ".shtml"
-#define BUG_REPORTS_TO   _("Andrew Wood <andrew.wood@ivarch.com>")
+#define BUG_REPORTS_TO   _("<pv@ivarch.com>")
 
 /* LFS support. */
 #undef ENABLE_LARGEFILE
@@ -69,10 +69,12 @@
 #  ifndef HAVE_STAT64
 #   define stat64 stat
 #   define fstat64 fstat
+#   define lstat64 lstat
 #  endif
 # else
 #  define stat64 stat
 #  define fstat64 fstat
+#  define lstat64 lstat
 # endif
 # define open64 open
 # define lseek64 lseek
@@ -81,6 +83,11 @@
 #undef HAVE_IPC
 #ifdef HAVE_SYS_IPC_H
 #define HAVE_IPC 1
+#endif
+
+#undef CURSOR_ANSWERBACK_BYTE_BY_BYTE
+#ifndef _AIX
+#define CURSOR_ANSWERBACK_BYTE_BY_BYTE 1
 #endif
 
 /* Support for debugging output. */

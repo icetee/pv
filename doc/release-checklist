@@ -15,6 +15,6 @@ Before releasing a new version, go through this checklist:
   - make manhtml | tidy -asxhtml | sed -e '1,/<body>/d' -e '/<\/body>/,$d'
   - update HTML for todo and news
   - copy and sign tar.gz to HTML directory
-  - submit new release to Freecode
+  - submit new release to Sourceforge
   - upload HTML
   - check validator results for project page and manual

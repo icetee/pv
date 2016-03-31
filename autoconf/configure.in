@@ -83,7 +83,13 @@ CFLAGS=${CFLAGS:-"-O"}
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_CHECK_PROG(DO_GZIP, gzip, gzip -f9, touch)
+
+dnl AIX needs -lc128
+dnl
+AC_EGREP_CPP([yes], [#ifdef _AIX
+yes
+#endif
+], [LIBS="$LIBS -lc128"])
 
 dnl NLS stuff.
 dnl

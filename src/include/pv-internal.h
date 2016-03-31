@@ -1,7 +1,5 @@
 /*
  * Functions internal to the PV library.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifndef _PV_INTERNAL_H
@@ -18,6 +16,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +29,9 @@ extern "C" {
 #define PV_DISPLAY_AVERAGERATE	16
 #define PV_DISPLAY_BYTES	32
 #define PV_DISPLAY_NAME		64
+#define PV_DISPLAY_BUFPERCENT	128
+#define PV_DISPLAY_OUTPUTBUF	256
+#define PV_DISPLAY_FINETA	512
 
 #define RATE_GRANULARITY	100000	 /* usec between -L rate chunks */
 #define REMOTE_INTERVAL		100000	 /* usec between checks for -R */
@@ -57,13 +59,18 @@ struct pvstate_s {
 	unsigned char numeric;           /* numeric output only */
 	unsigned char wait;              /* wait for data before display */
 	unsigned char linemode;          /* count lines instead of bytes */
+	unsigned char null;              /* lines are null-terminated */
 	unsigned char no_op;             /* do nothing other than pipe data */
 	unsigned char skip_errors;       /* skip read errors flag */
 	unsigned char stop_at_size;      /* set if we stop at "size" bytes */
+	unsigned char no_splice;         /* never use splice() */
 	unsigned long long rate_limit;   /* rate limit, in bytes per second */
 	unsigned long long target_buffer_size;  /* buffer size (0=default) */
 	unsigned long long size;         /* total size of data */
 	double interval;                 /* interval between updates */
+	double delay_start;              /* delay before first display */
+	unsigned int watch_pid;		 /* process to watch fds of */
+	int watch_fd;			 /* fd to watch */
 	unsigned int width;              /* screen width */
 	unsigned int height;             /* screen height */
 	const char *name;		 /* display name */
@@ -84,8 +91,8 @@ struct pvstate_s {
 	struct timeval pv_sig_tstp_time; /* see pv_sig_tstp() / __cont() */
 	struct timeval pv_sig_toffset;		 /* total time spent stopped */
 	volatile sig_atomic_t pv_sig_newsize;	 /* whether we need to get term size again */
-	volatile sig_atomic_t pv_sig_abort;		 /* whether we need to abort right now */
-	volatile sig_atomic_t reparse_display;
+	volatile sig_atomic_t pv_sig_abort;	 /* whether we need to abort right now */
+	volatile sig_atomic_t reparse_display;	 /* whether to re-check format string */
 	struct sigaction pv_sig_old_sigpipe;
 	struct sigaction pv_sig_old_sigttou;
 	struct sigaction pv_sig_old_sigtstp;
@@ -102,22 +109,29 @@ struct pvstate_s {
 	long double prev_elapsed_sec;
 	long double prev_rate;
 	long double prev_trans;
+	unsigned long long initial_offset;
 	char *display_buffer;
 	long display_buffer_size;
+	int lastoutput_length;		 /* number of last-output bytes to show */
+	unsigned char lastoutput_buffer[256];
 	int prev_width;			 /* screen width last time we were called */
 	int prev_length;		 /* length of last string we output */
-	char str_name[512];		 /* RATS: ignore (big enough) */
-	char str_transferred[128];	 /* RATS: ignore (big enough) */
-	char str_timer[128];		 /* RATS: ignore (big enough) */
-	char str_rate[128];		 /* RATS: ignore (big enough) */
-	char str_average_rate[128];	 /* RATS: ignore (big enough) */
-	char str_progress[1024];	 /* RATS: ignore (big enough) */
-	char str_eta[128];		 /* RATS: ignore (big enough) */
+	char str_name[512];
+	char str_transferred[128];
+	char str_bufpercent[128];
+	char str_timer[128];
+	char str_rate[128];
+	char str_average_rate[128];
+	char str_progress[1024];
+	char str_lastoutput[512];
+	char str_eta[128];
+	char str_fineta[128];
 	unsigned long components_used;	 /* bitmask of components used */
 	struct {
 		const char *string;
 		int length;
 	} format[100];
+	unsigned char display_visible;	 /* set once anything written to terminal */
 
 	/********************
 	 * Cursor/IPC state *
@@ -133,7 +147,7 @@ struct pvstate_s {
 	int crs_noipc;			 /* set if we can't use IPC */
 #endif				/* HAVE_IPC */
 	int crs_lock_fd;		 /* fd of lockfile, -1 if none open */
-	char crs_lock_file[1024];	 /* RATS: ignore */
+	char crs_lock_file[1024];
 	int crs_y_start;		 /* our initial Y coordinate */
 
 	/*******************
@@ -191,6 +205,23 @@ struct pvstate_s {
 };
 
 
+struct pvwatchfd_s {
+	unsigned int watch_pid;		 /* PID to watch */
+	int watch_fd;			 /* fd to watch, -1 = not displayed */
+	char file_fdinfo[4096];		 /* path to /proc fdinfo file */
+	char file_fd[4096];		 /* path to /proc fd symlink  */
+	char file_fdpath[4096];		 /* path to file that was opened */
+	char display_name[512];		 /* name to show on progress bar */
+	struct stat64 sb_fd;		 /* stat of fd symlink */
+	struct stat64 sb_fd_link;	 /* lstat of fd symlink */
+	unsigned long long size;	 /* size of whole file, 0 if unknown */
+	long long position;		 /* position last seen at */
+	struct timeval start_time;	 /* time we started watching the fd */
+};
+typedef struct pvwatchfd_s *pvwatchfd_t;
+
+void pv_error(pvstate_t, char *, ...);
+
 int pv_main_loop(pvstate_t);
 void pv_display(pvstate_t, long double, long long, long long);
 long pv_transfer(pvstate_t, int, int *, int *, unsigned long long, long *);
@@ -212,6 +243,12 @@ void pv_remote_init(pvstate_t);
 void pv_remote_check(pvstate_t);
 void pv_remote_fini(pvstate_t);
 int pv_remote_set(pvstate_t);
+
+int pv_watchfd_info(pvstate_t, pvwatchfd_t, int);
+int pv_watchfd_changed(pvwatchfd_t);
+long long pv_watchfd_position(pvwatchfd_t);
+int pv_watchpid_scanfds(pvstate_t, pvstate_t, unsigned int, int *, pvwatchfd_t *, pvstate_t *, int *);
+void pv_watchpid_setname(pvstate_t, pvwatchfd_t);
 
 #ifdef __cplusplus
 }

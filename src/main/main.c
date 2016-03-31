@@ -1,8 +1,6 @@
 /*
  * Main program entry point - read the command line options, then perform
  * the appropriate actions.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -109,21 +107,24 @@ int main(int argc, char **argv)
 	pv_state_inputfiles(state, opts->argc,
 			    (const char **) (opts->argv));
 
-	/*
-	 * If no size was given, try to work one out.
-	 */
-	if (0 == opts->size) {
-		opts->size = pv_calc_total_size(state);
-		debug("%s: %llu", "no size given - calculated",
-		      opts->size);
-	}
+	if (0 == opts->watch_pid) {
+		/*
+		 * If no size was given, and we're not in line mode, try to
+		 * calculate the total size.
+		 */
+		if ((0 == opts->size) && (0 == opts->linemode)) {
+			opts->size = pv_calc_total_size(state);
+			debug("%s: %llu", "no size given - calculated",
+			      opts->size);
+		}
 
-	/*
-	 * If the size is unknown, we cannot have an ETA.
-	 */
-	if (opts->size < 1) {
-		opts->eta = 0;
-		debug("%s", "size unknown - ETA disabled");
+		/*
+		 * If the size is unknown, we cannot have an ETA.
+		 */
+		if (opts->size < 1) {
+			opts->eta = 0;
+			debug("%s", "size unknown - ETA disabled");
+		}
 	}
 
 	/*
@@ -188,18 +189,24 @@ int main(int argc, char **argv)
 	pv_state_cursor_set(state, opts->cursor);
 	pv_state_numeric_set(state, opts->numeric);
 	pv_state_wait_set(state, opts->wait);
+	pv_state_delay_start_set(state, opts->delay_start);
 	pv_state_linemode_set(state, opts->linemode);
+	pv_state_null_set(state, opts->null);
 	pv_state_skip_errors_set(state, opts->skip_errors);
 	pv_state_stop_at_size_set(state, opts->stop_at_size);
 	pv_state_rate_limit_set(state, opts->rate_limit);
 	pv_state_target_buffer_size_set(state, opts->buffer_size);
+	pv_state_no_splice_set(state, opts->no_splice);
 	pv_state_size_set(state, opts->size);
 	pv_state_name_set(state, opts->name);
 	pv_state_format_string_set(state, opts->format);
+	pv_state_watch_pid_set(state, opts->watch_pid);
+	pv_state_watch_fd_set(state, opts->watch_fd);
 
 	pv_state_set_format(state, opts->progress, opts->timer, opts->eta,
-			    opts->rate, opts->average_rate, opts->bytes,
-			    opts->name);
+			    opts->fineta, opts->rate, opts->average_rate,
+			    opts->bytes, opts->bufpercent,
+			    opts->lastwritten, opts->name);
 
 #ifdef MAKE_STDOUT_NONBLOCKING
 	/*
@@ -224,20 +231,32 @@ int main(int argc, char **argv)
 	t.c_lflag |= TOSTOP;
 	tcsetattr(STDERR_FILENO, TCSANOW, &t);
 
-	pv_sig_init(state);
-
-	pv_remote_init();
-
-	retcode = pv_main_loop(state);
-
-	pv_remote_fini();
-
-	tcsetattr(STDERR_FILENO, TCSANOW, &t_save);
-
-	if (opts->pidfile != NULL)
-		remove(opts->pidfile);
-
-	pv_sig_fini(state);
+	if (0 != opts->watch_pid) {
+		if (0 <= opts->watch_fd) {
+			pv_sig_init(state);
+			retcode = pv_watchfd_loop(state);
+			tcsetattr(STDERR_FILENO, TCSANOW, &t_save);
+			if (opts->pidfile != NULL)
+				remove(opts->pidfile);
+			pv_sig_fini(state);
+		} else {
+			pv_sig_init(state);
+			retcode = pv_watchpid_loop(state);
+			tcsetattr(STDERR_FILENO, TCSANOW, &t_save);
+			if (opts->pidfile != NULL)
+				remove(opts->pidfile);
+			pv_sig_fini(state);
+		}
+	} else {
+		pv_sig_init(state);
+		pv_remote_init();
+		retcode = pv_main_loop(state);
+		pv_remote_fini();
+		tcsetattr(STDERR_FILENO, TCSANOW, &t_save);
+		if (opts->pidfile != NULL)
+			remove(opts->pidfile);
+		pv_sig_fini(state);
+	}
 
 	pv_state_free(state);
 

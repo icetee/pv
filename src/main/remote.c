@@ -1,7 +1,5 @@
 /*
  * Remote-control functions.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -30,17 +28,20 @@ struct remote_msg {
 	unsigned char progress;		 /* progress bar flag */
 	unsigned char timer;		 /* timer flag */
 	unsigned char eta;		 /* ETA flag */
+	unsigned char fineta;		 /* absolute ETA flag */
 	unsigned char rate;		 /* rate counter flag */
 	unsigned char average_rate;	 /* average rate counter flag */
 	unsigned char bytes;		 /* bytes transferred flag */
+	unsigned char bufpercent;	 /* transfer buffer percentage flag */
+	unsigned int lastwritten;	 /* last-written bytes count */
 	unsigned long long rate_limit;	 /* rate limit, in bytes per second */
 	unsigned long long buffer_size;	 /* buffer size, in bytes (0=default) */
 	unsigned long long size;	 /* total size of data */
 	double interval;		 /* interval between updates */
 	unsigned int width;		 /* screen width */
 	unsigned int height;		 /* screen height */
-	char name[256];			 /* RATS: ignore */
-	char format[256];		 /* RATS: ignore */
+	char name[256];
+	char format[256];
 };
 
 
@@ -78,7 +79,7 @@ static key_t remote__genkey(void)
 static int remote__msgget(void)
 {
 	/* Catch SIGSYS in case msgget() raises it, so we get ENOSYS */
-	signal(SIGSYS, SIG_IGN);	    /* RATS: ignore (OK) */
+	signal(SIGSYS, SIG_IGN);
 	return msgget(remote__genkey(), IPC_CREAT | 0600);
 }
 
@@ -131,9 +132,12 @@ int pv_remote_set(opts_t opts)
 	msgbuf.progress = opts->progress;
 	msgbuf.timer = opts->timer;
 	msgbuf.eta = opts->eta;
+	msgbuf.fineta = opts->fineta;
 	msgbuf.rate = opts->rate;
 	msgbuf.average_rate = opts->average_rate;
 	msgbuf.bytes = opts->bytes;
+	msgbuf.bufpercent = opts->bufpercent;
+	msgbuf.lastwritten = opts->lastwritten;
 	msgbuf.rate_limit = opts->rate_limit;
 	msgbuf.buffer_size = opts->buffer_size;
 	msgbuf.size = opts->size;
@@ -253,8 +257,10 @@ void pv_remote_check(pvstate_t state)
 	pv_state_name_set(state, NULL);
 
 	pv_state_set_format(state, msgbuf.progress, msgbuf.timer,
-			    msgbuf.eta, msgbuf.rate, msgbuf.average_rate,
-			    msgbuf.bytes,
+			    msgbuf.eta, msgbuf.fineta, msgbuf.rate,
+			    msgbuf.average_rate,
+			    msgbuf.bytes, msgbuf.bufpercent,
+			    msgbuf.lastwritten,
 			    0 ==
 			    msgbuf.name[0] ? NULL : strdup(msgbuf.name));
 

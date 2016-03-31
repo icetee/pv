@@ -1,7 +1,5 @@
 /*
  * Functions for opening and closing files.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "pv-internal.h"
@@ -62,9 +60,8 @@ unsigned long long pv_calc_total_size(pvstate_t state)
 		}
 
 		if (rc != 0) {
-			fprintf(stderr, "%s: %s: %s\n",
-				state->program_name, state->input_files[i],
-				strerror(errno));
+			pv_error(state, "%s: %s",
+				 state->input_files[i], strerror(errno));
 			for (j = i; j < state->input_file_count - 1; j++) {
 				state->input_files[j] =
 				    state->input_files[j + 1];
@@ -90,10 +87,9 @@ unsigned long long pv_calc_total_size(pvstate_t state)
 				total += lseek64(fd, 0, SEEK_END);
 				close(fd);
 			} else {
-				fprintf(stderr, "%s: %s: %s\n",
-					state->program_name,
-					state->input_files[i],
-					strerror(errno));
+				pv_error(state, "%s: %s",
+					 state->input_files[i],
+					 strerror(errno));
 				state->exit_status |= 2;
 			}
 		} else if (S_ISREG(sb.st_mode)) {
@@ -117,11 +113,10 @@ unsigned long long pv_calc_total_size(pvstate_t state)
 		    && (0 == (fcntl(STDOUT_FILENO, F_GETFL) & O_APPEND))) {
 			total = lseek64(STDOUT_FILENO, 0, SEEK_END);
 			if (lseek64(STDOUT_FILENO, 0, SEEK_SET) != 0) {
-				fprintf(stderr, "%s: %s: %s: %s\n",
-					state->program_name, "(stdout)",
-					_
-					("failed to seek to start of output"),
-					strerror(errno));
+				pv_error(state, "%s: %s: %s", "(stdout)",
+					 _
+					 ("failed to seek to start of output"),
+					 strerror(errno));
 				state->exit_status |= 2;
 			}
 			/*
@@ -164,25 +159,22 @@ unsigned long long pv_calc_total_size(pvstate_t state)
 		}
 
 		if (fd < 0) {
-			fprintf(stderr, "%s: %s: %s\n",
-				state->program_name, state->input_files[i],
-				strerror(errno));
+			pv_error(state, "%s: %s", state->input_files[i],
+				 strerror(errno));
 			total = 0;
 			state->exit_status |= 2;
 			return total;
 		}
 
 		while (1) {
-			unsigned char scanbuf[1024];	/* RATS: ignore (OK) */
+			unsigned char scanbuf[1024];
 			int numread, j;
 
-			numread = read(fd, /* RATS: ignore (OK) */ scanbuf,
-				       sizeof(scanbuf));
+			numread = read(fd, scanbuf, sizeof(scanbuf));
 			if (numread < 0) {
-				fprintf(stderr, "%s: %s: %s\n",
-					state->program_name,
-					state->input_files[i],
-					strerror(errno));
+				pv_error(state, "%s: %s",
+					 state->input_files[i],
+					 strerror(errno));
 				state->exit_status |= 2;
 				break;
 			} else if (0 == numread) {
@@ -218,10 +210,9 @@ int pv_next_file(pvstate_t state, int filenum, int oldfd)
 
 	if (oldfd > 0) {
 		if (close(oldfd)) {
-			fprintf(stderr, "%s: %s: %s\n",
-				state->program_name,
-				_("failed to close file"),
-				strerror(errno));
+			pv_error(state, "%s: %s",
+				 _("failed to close file"),
+				 strerror(errno));
 			state->exit_status |= 8;
 			return -1;
 		}
@@ -242,30 +233,27 @@ int pv_next_file(pvstate_t state, int filenum, int oldfd)
 	} else {
 		fd = open64(state->input_files[filenum], O_RDONLY);
 		if (fd < 0) {
-			fprintf(stderr, "%s: %s: %s: %s\n",
-				state->program_name,
-				_("failed to read file"),
-				state->input_files[filenum],
-				strerror(errno));
+			pv_error(state, "%s: %s: %s",
+				 _("failed to read file"),
+				 state->input_files[filenum],
+				 strerror(errno));
 			state->exit_status |= 2;
 			return -1;
 		}
 	}
 
 	if (fstat64(fd, &isb)) {
-		fprintf(stderr, "%s: %s: %s: %s\n",
-			state->program_name,
-			_("failed to stat file"),
-			state->input_files[filenum], strerror(errno));
+		pv_error(state, "%s: %s: %s",
+			 _("failed to stat file"),
+			 state->input_files[filenum], strerror(errno));
 		close(fd);
 		state->exit_status |= 2;
 		return -1;
 	}
 
 	if (fstat64(STDOUT_FILENO, &osb)) {
-		fprintf(stderr, "%s: %s: %s\n",
-			state->program_name,
-			_("failed to stat output file"), strerror(errno));
+		pv_error(state, "%s: %s",
+			 _("failed to stat output file"), strerror(errno));
 		close(fd);
 		state->exit_status |= 2;
 		return -1;
@@ -287,10 +275,9 @@ int pv_next_file(pvstate_t state, int filenum, int oldfd)
 		input_file_is_stdout = 0;
 
 	if (input_file_is_stdout) {
-		fprintf(stderr, "%s: %s: %s\n",
-			state->program_name,
-			_("input file is output file"),
-			state->input_files[filenum]);
+		pv_error(state, "%s: %s",
+			 _("input file is output file"),
+			 state->input_files[filenum]);
 		close(fd);
 		state->exit_status |= 4;
 		return -1;

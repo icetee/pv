@@ -1,7 +1,5 @@
 /*
  * Output command-line help to stdout.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -35,12 +33,19 @@ void display_help(void)
 		 N_("show elapsed time")},
 		{"-e", "--eta", 0,
 		 N_("show estimated time of arrival (completion)")},
+		{"-I", "--fineta", 0,
+		 N_
+		 ("show absolute estimated time of arrival (completion)")},
 		{"-r", "--rate", 0,
 		 N_("show data transfer rate counter")},
 		{"-a", "--average-rate", 0,
 		 N_("show data transfer average rate counter")},
 		{"-b", "--bytes", 0,
 		 N_("show number of bytes transferred")},
+		{"-T", "--buffer-percent", 0,
+		 N_("show percentage of transfer buffer in use")},
+		{"-A", "--last-written", _("NUM"),
+		 N_("show NUM bytes last written")},
 		{"-F", "--format", N_("FORMAT"),
 		 N_("set output format to FORMAT")},
 		{"-n", "--numeric", 0,
@@ -50,10 +55,14 @@ void display_help(void)
 		{"", 0, 0, 0},
 		{"-W", "--wait", 0,
 		 N_("display nothing until first byte transferred")},
+		{"-D", "--delay-start", N_("SEC"),
+		 N_("display nothing until SEC seconds have passed")},
 		{"-s", "--size", N_("SIZE"),
 		 N_("set estimated data size to SIZE bytes")},
 		{"-l", "--line-mode", 0,
 		 N_("count lines instead of bytes")},
+		{"-0", "--null", 0,
+		 N_("lines are null-terminated")},
 		{"-i", "--interval", N_("SEC"),
 		 N_("update every SEC seconds")},
 		{"-w", "--width", N_("WIDTH"),
@@ -71,6 +80,8 @@ void display_help(void)
 		 N_("limit transfer to RATE bytes per second")},
 		{"-B", "--buffer-size", N_("BYTES"),
 		 N_("use a buffer size of BYTES")},
+		{"-C", "--no-splice", 0,
+		 N_("never use splice(), always use read/write")},
 		{"-E", "--skip-errors", 0,
 		 N_("skip read errors in input")},
 		{"-S", "--stop-at-size", 0,
@@ -83,6 +94,9 @@ void display_help(void)
 		{"-P", "--pidfile", N_("FILE"),
 		 N_("save process ID in FILE")},
 		{"", 0, 0, 0},
+		{"-d", "--watchfd", N_("PID[:FD]"),
+		 N_("watch file FD opened by process PID")},
+		{"", 0, 0, 0},
 		{"-h", "--help", 0,
 		 N_("show this help and exit")},
 		{"-V", "--version", 0,
@@ -92,8 +106,7 @@ void display_help(void)
 	int i, col1max = 0, tw = 77;
 	char *optbuf;
 
-	printf(_("Usage: %s [OPTION] [FILE]..."),	/* RATS: ignore */
-	       PROGRAM_NAME);
+	printf(_("Usage: %s [OPTION] [FILE]..."), PROGRAM_NAME);
 	printf("\n%s\n\n",
 	       _
 	       ("Concatenate FILE(s), or standard input, to standard output,\n"
@@ -103,16 +116,16 @@ void display_help(void)
 		int width = 0;
 		char *param;
 
-		width = 2 + strlen(optlist[i].optshort);	/* RATS: ignore */
+		width = 2 + strlen(optlist[i].optshort);
 #ifdef HAVE_GETOPT_LONG
 		if (optlist[i].optlong)
-			width += 2 + strlen(optlist[i].optlong);	/* RATS: ignore */
+			width += 2 + strlen(optlist[i].optlong);
 #endif
 		param = optlist[i].param;
 		if (param)
 			param = _(param);
 		if (param)
-			width += 1 + strlen(param);	/* RATS: ignore */
+			width += 1 + strlen(param);
 
 		if (width > col1max)
 			col1max = width;
@@ -144,8 +157,7 @@ void display_help(void)
 		if (description)
 			description = _(description);
 
-		sprintf(optbuf, "%s%s%s%s%s",	/* RATS: ignore (checked) */
-			optlist[i].optshort,
+		sprintf(optbuf, "%s%s%s%s%s", optlist[i].optshort,
 #ifdef HAVE_GETOPT_LONG
 			optlist[i].optlong ? ", " : "",
 			optlist[i].optlong ? optlist[i].optlong : "",
@@ -163,7 +175,7 @@ void display_help(void)
 
 		start = description;
 
-		while (strlen(start) /* RATS: ignore */ >tw - col1max) {
+		while (strlen(start) > tw - col1max) {
 			end = start + tw - col1max;
 			while ((end > start) && (end[0] != ' '))
 				end--;
@@ -190,8 +202,7 @@ void display_help(void)
 #endif
 
 	printf("\n");
-	printf(_("Please report any bugs to %s."),	/* RATS: ignore */
-	       BUG_REPORTS_TO);
+	printf(_("Please report any bugs to %s."), BUG_REPORTS_TO);
 	printf("\n");
 }
 

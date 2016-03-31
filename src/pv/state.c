@@ -1,11 +1,10 @@
 /*
  * State management functions.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "pv-internal.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,6 +21,8 @@ pvstate_t pv_state_alloc(const char *program_name)
 		return 0;
 
 	state->program_name = program_name;
+	state->watch_pid = 0;
+	state->watch_fd = -1;
 #ifdef HAVE_IPC
 	state->crs_shmid = -1;
 	state->crs_pvcount = 1;
@@ -30,6 +31,10 @@ pvstate_t pv_state_alloc(const char *program_name)
 
 	state->reparse_display = 1;
 	state->current_file = _("none");
+#ifdef HAVE_SPLICE
+	state->splice_failed_fd = -1;
+#endif				/* HAVE_SPLICE */
+	state->display_visible = 0;
 
 	return state;
 }
@@ -62,8 +67,10 @@ void pv_state_free(pvstate_t state)
  */
 void pv_state_set_format(pvstate_t state, unsigned char progress,
 			 unsigned char timer, unsigned char eta,
-			 unsigned char rate, unsigned char average_rate,
-			 unsigned char bytes, const char *name)
+			 unsigned char fineta, unsigned char rate,
+			 unsigned char average_rate, unsigned char bytes,
+			 unsigned char bufpercent,
+			 unsigned int lastwritten, const char *name)
 {
 #define PV_ADDFORMAT(x,y) if (x) { \
 		if (state->default_format[0] != 0) \
@@ -74,11 +81,18 @@ void pv_state_set_format(pvstate_t state, unsigned char progress,
 	state->default_format[0] = 0;
 	PV_ADDFORMAT(name, "%N");
 	PV_ADDFORMAT(bytes, "%b");
+	PV_ADDFORMAT(bufpercent, "%T");
 	PV_ADDFORMAT(timer, "%t");
 	PV_ADDFORMAT(rate, "%r");
 	PV_ADDFORMAT(average_rate, "%a");
 	PV_ADDFORMAT(progress, "%p");
 	PV_ADDFORMAT(eta, "%e");
+	PV_ADDFORMAT(fineta, "%I");
+	if (lastwritten > 0) {
+		char buf[16];
+		sprintf(buf, "%%%uA", lastwritten);
+		PV_ADDFORMAT(lastwritten, buf);
+	}
 
 	state->name = name;
 	state->reparse_display = 1;
@@ -105,9 +119,19 @@ void pv_state_wait_set(pvstate_t state, unsigned char val)
 	state->wait = val;
 };
 
+void pv_state_delay_start_set(pvstate_t state, double val)
+{
+	state->delay_start = val;
+};
+
 void pv_state_linemode_set(pvstate_t state, unsigned char val)
 {
 	state->linemode = val;
+};
+
+void pv_state_null_set(pvstate_t state, unsigned char val)
+{
+	state->null = val;
 };
 
 void pv_state_no_op_set(pvstate_t state, unsigned char val)
@@ -134,6 +158,11 @@ void pv_state_target_buffer_size_set(pvstate_t state,
 				     unsigned long long val)
 {
 	state->target_buffer_size = val;
+};
+
+void pv_state_no_splice_set(pvstate_t state, unsigned char val)
+{
+	state->no_splice = val;
 };
 
 void pv_state_size_set(pvstate_t state, unsigned long long val)
@@ -164,6 +193,16 @@ void pv_state_name_set(pvstate_t state, const char *val)
 void pv_state_format_string_set(pvstate_t state, const char *val)
 {
 	state->format_string = val;
+};
+
+void pv_state_watch_pid_set(pvstate_t state, unsigned int val)
+{
+	state->watch_pid = val;
+};
+
+void pv_state_watch_fd_set(pvstate_t state, int val)
+{
+	state->watch_fd = val;
 };
 
 

@@ -1,10 +1,10 @@
 Summary: Monitor the progress of data through a pipe
 Name: pv
-Version: 1.4.6
+Version: 1.6.0
 Release: 1%{?dist}
 License: Artistic 2.0
 Group: Development/Tools
-Source: http://www.ivarch.com/programs/sources/pv-1.4.6.tar.gz
+Source: http://www.ivarch.com/programs/sources/pv-1.6.0.tar.gz
 Url: http://www.ivarch.com/programs/pv.shtml
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gettext
@@ -46,6 +46,55 @@ make test
 %doc README doc/NEWS doc/TODO doc/COPYING
 
 %changelog
+* Sun Mar 15 2015 Andrew Wood <andrew.wood@ivarch.com> 1.6.0-1
+- fix lstat64 support when unavailable - separate patches supplied by Ganael
+  Laplanche and Peter Korsgaard
+- (#1506) new option "-D" / "--delay-start" to only show bar after N seconds
+  (Damon Harper)
+- new option "--fineta" / "-I" to show ETA as time of day rather than time
+  remaining - patch supplied by Erkki Seppälä (r147)
+- (#1509) change ETA (--eta / -e) so that days are given if the hours
+  remaining are 24 or more (Jacek Wielemborek)
+- (#1499) repeat read and write attempts on partial buffer fill/empty to
+  work around post-signal transfer rate drop reported by Ralf Ramsauer
+- (#1507) do not try to calculate total size in line mode, due to bug
+  reported by Jacek Wielemborek and Michiel Van Herwegen
+- cleanup: removed defunct RATS comments and unnecessary copyright notices
+- clean up displayed lines when using --watchfd PID, when PID exits
+- output errors on a new line to avoid overwriting transfer bar
+
+* Tue Aug 26 2014 Andrew Wood <andrew.wood@ivarch.com> 1.5.7-1
+- show KiB instead of incorrect kiB (Debian bug #706175)
+- (#1284) do not gzip man page, for non-Linux OSes (Bob Friesenhahn)
+- work around "awk" bug in tests/016-numeric-timer in decimal "," locales
+- fix "make rpm" and "make srpm", extend "make release" to sign releases
+
+* Sun May  4 2014 Andrew Wood <andrew.wood@ivarch.com> 1.5.3-1
+- remove SPLICE_F_NONBLOCK to fix problem with slow splice() (Jan Seda)
+
+* Mon Feb 10 2014 Andrew Wood <andrew.wood@ivarch.com> 1.5.2-1
+- allow "--watchfd" to look at block devices
+- let "--watchfd PID:FD" work with "--size N"
+- moved contributors out of the manual as the list was too long
+- (NB everyone is still listed in the README and always will be)
+
+* Thu Jan 23 2014 Andrew Wood <andrew.wood@ivarch.com> 1.5.1-1
+- new option "--watchfd" - suggested by Jacek Wielemborek and "fdwatch"
+- use non-block flag with splice()
+- new display option "--buffer-percent", suggested by Kim Krecht
+- new display option "--last-written", suggested by Kim Krecht
+- new transfer option "--no-splice"
+- fix for minor bug which dropped display elements after one empty one
+- fix for single fd leak on exit (Cristian Ciupitu, Josh Stone)
+
+* Mon Aug  5 2013 Andrew Wood <andrew.wood@ivarch.com> 1.4.12-1
+- new option "--null" - patch supplied by Zing Shishak
+- AIX build fix (add "-lc128") - with help from Pawel Piatek
+- AIX "-c" fixes - with help from Pawel Piatek
+- SCO build fix (po2table.sh) - reported by Wouter Pronk
+- test scripts fix for older distributions - patch from Bryan Dongray
+- fix for splice() not using stdin - patch from Zev Weiss
+
 * Tue Jan 22 2013 Andrew Wood <andrew.wood@ivarch.com> 1.4.6-1
 - added patch from Pawel Piatek to omit O_NOFOLLOW in AIX
 

@@ -1,7 +1,5 @@
 /*
  * Output version information to stdout.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -16,11 +14,10 @@
  */
 void display_version(void)
 {
-	printf(_("%s %s - Copyright(C) %s %s"),	/* RATS: ignore */
+	printf(_("%s %s - Copyright %s %s"),
 	       PROGRAM_NAME, VERSION, COPYRIGHT_YEAR, COPYRIGHT_HOLDER);
 	printf("\n\n");
-	printf(_("Web site: %s"),	    /* RATS: ignore */
-	       PROJECT_HOMEPAGE);
+	printf(_("Web site: %s"), PROJECT_HOMEPAGE);
 	printf("\n\n");
 	printf("%s",
 	       _("This program is free software, and is being distributed "

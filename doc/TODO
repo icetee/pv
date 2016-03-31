@@ -1,13 +1,19 @@
 Things still to do:
 
+  - (#1505) option to switch rate to per minute if really slow
+  - (#1477) make 13GB be shown as 13.0GB so it's the same width as 13.1GB
+  - (#1508) add watchfd tests
+  - (#1510) option "--progress-from FILE", read last number and use it as bytes read:
+    pv --progress-from <( while sleep 1; do du -sb somedir; done ) -s 123g
+    (Jacek Wielemborek)
+  - (#1476) (Debian #507682) adjustable averaging window for rate display
   - (#1293) check transfer buffer usage on large memory systems
-  - (#1284) fix install on OSes without man page .gz (Bob Friesenhahn)
   - (#1286) option for process title (Martin Sarsale) as "pv - name:FooProcess -xyz - transferred: 1.3GB - 500KB/s - running: 10:15:30s"
   - (#1290) look at effect of O_SYNC or fsync on performance
   - (#1281) option (-x?) to use xterm title line for status (Joachim Haga)
   - (#1287) if the first pv exits, should the second become IPC leader?
 
-  - add development support for http://clang.llvm.org/StaticAnalysis.html
+  - add development support for http://clang-analyzer.llvm.org/
   - stats for avg/min/max/stddev throughput (Venky.N.Iyer)
   - option to enable O_DIRECT (Romain Kang)
   - pv-ify a command line (Will Entriken) - "pv FOO | BAR | BAZ"

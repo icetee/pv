@@ -1,7 +1,5 @@
 /*
  * Replacement getopt function's header file. Include this AFTER config.h.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifndef _LIBRARY_GETOPT_H

@@ -1,7 +1,5 @@
 /*
  * Output debugging information.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -31,10 +29,10 @@ void debugging_output(const char *function, const char *file, int line,
 	va_list ap;
 	time_t t;
 	struct tm *tm;
-	char tbuf[128];			 /* RATS: ignore (big enough) */
+	char tbuf[128];
 
 	if (tried_open == 0) {
-		debugfile = getenv("DEBUG");	/* RATS: ignore (OK) */
+		debugfile = getenv("DEBUG");
 		if (debugfile != NULL)
 			debugfptr = fopen(debugfile, "a");
 		tried_open = 1;
@@ -52,7 +50,7 @@ void debugging_output(const char *function, const char *file, int line,
 		function, file, line);
 
 	va_start(ap, format);
-	vfprintf(debugfptr, format, ap);    /* RATS: ignore */
+	vfprintf(debugfptr, format, ap);
 	va_end(ap);
 
 	fprintf(debugfptr, "\n");

@@ -9,8 +9,6 @@
  * However, some OSes (FreeBSD and MacOS X so far) don't allow locking of a
  * terminal, so we try to use a lockfile if terminal locking doesn't work,
  * and finally abort if even that is unavailable.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "pv-internal.h"
@@ -48,13 +46,12 @@ static void pv_crs_open_lockfile(pvstate_t state, int fd)
 
 	state->crs_lock_fd = -1;
 
-	ttydev = ttyname(fd);		    /* RATS: ignore */
+	ttydev = ttyname(fd);
 	if (!ttydev) {
 		if (!state->force) {
-			fprintf(stderr, "%s: %s: %s\n",
-				state->program_name,
-				_("failed to get terminal name"),
-				strerror(errno));
+			pv_error(state, "%s: %s",
+				 _("failed to get terminal name"),
+				 strerror(errno));
 		}
 		/*
 		 * If we don't know our terminal name, we can neither do IPC
@@ -66,9 +63,9 @@ static void pv_crs_open_lockfile(pvstate_t state, int fd)
 		return;
 	}
 
-	tmpdir = (char *) getenv("TMPDIR"); /* RATS: ignore */
+	tmpdir = (char *) getenv("TMPDIR");
 	if (!tmpdir)
-		tmpdir = (char *) getenv("TMP");	/* RATS: ignore */
+		tmpdir = (char *) getenv("TMP");
 	if (!tmpdir)
 		tmpdir = "/tmp";
 
@@ -77,7 +74,7 @@ static void pv_crs_open_lockfile(pvstate_t state, int fd)
 		 "%s/pv-%s-%i.lock", tmpdir, basename(ttydev),
 		 (int) geteuid());
 #else
-	sprintf(state->crs_lock_file,	    /* RATS: ignore */
+	sprintf(state->crs_lock_file,
 		"%.*s/pv-%8s-%i.lock",
 		sizeof(state->crs_lock_file) - 64, tmpdir,
 		basename(ttydev), (int) geteuid());
@@ -94,9 +91,9 @@ static void pv_crs_open_lockfile(pvstate_t state, int fd)
 
 	state->crs_lock_fd = open(state->crs_lock_file, openflags, 0600);
 	if (state->crs_lock_fd < 0) {
-		fprintf(stderr, "%s: %s: %s: %s\n", state->program_name,
-			state->crs_lock_file,
-			_("failed to open lock file"), strerror(errno));
+		pv_error(state, "%s: %s: %s",
+			 state->crs_lock_file,
+			 _("failed to open lock file"), strerror(errno));
 		state->cursor = 0;
 		return;
 	}
@@ -128,10 +125,9 @@ static void pv_crs_lock(pvstate_t state, int fd)
 					lock_fd = state->crs_lock_fd;
 				}
 			} else {
-				fprintf(stderr, "%s: %s: %s\n",
-					state->program_name,
-					_("lock attempt failed"),
-					strerror(errno));
+				pv_error(state, "%s: %s",
+					 _("lock attempt failed"),
+					 strerror(errno));
 				return;
 			}
 		}
@@ -206,9 +202,12 @@ static int pv_crs_get_ypos(int terminalfd)
 {
 	struct termios tty;
 	struct termios old_tty;
-	char cpr[32];			 /* RATS: ignore (checked) */
+	char cpr[32];
 	int ypos;
-	int r, got;
+	int r;
+#ifdef CURSOR_ANSWERBACK_BYTE_BY_BYTE
+	int got;
+#endif				/* CURSOR_ANSWERBACK_BYTE_BY_BYTE */
 
 	tcgetattr(terminalfd, &tty);
 	tcgetattr(terminalfd, &old_tty);
@@ -219,8 +218,10 @@ static int pv_crs_get_ypos(int terminalfd)
 
 	memset(cpr, 0, sizeof(cpr));
 
+#ifdef CURSOR_ANSWERBACK_BYTE_BY_BYTE
+	/* Read answerback byte by byte - fails on AIX */
 	for (got = 0, r = 0; got < sizeof(cpr) - 2; got += r) {
-		r = read(terminalfd, cpr + got, 1);	/* RATS: ignore (OK) */
+		r = read(terminalfd, cpr + got, 1);
 		if (r <= 0) {
 			debug("got=%d, r=%d: %s", got, r, strerror(errno));
 			break;
@@ -233,6 +234,20 @@ static int pv_crs_get_ypos(int terminalfd)
 	    ("read answerback message from fd %d, length %d - buf = %02X %02X %02X %02X %02X %02X",
 	     terminalfd, got, cpr[0], cpr[1], cpr[2], cpr[3], cpr[4],
 	     cpr[5]);
+
+#else				/* !CURSOR_ANSWERBACK_BYTE_BY_BYTE */
+	/* Read answerback in one big lump - may fail on Solaris */
+	r = read(terminalfd, cpr, sizeof(cpr));
+	if (r <= 0) {
+		debug("r=%d: %s", r, strerror(errno));
+	} else {
+		debug
+		    ("read answerback message from fd %d, length %d - buf = %02X %02X %02X %02X %02X %02X",
+		     terminalfd, r, cpr[0], cpr[1], cpr[2], cpr[3], cpr[4],
+		     cpr[5]);
+
+	}
+#endif				/* CURSOR_ANSWERBACK_BYTE_BY_BYTE */
 
 	ypos = pv_getnum_i(cpr + 2);
 
@@ -339,7 +354,7 @@ void pv_crs_init(pvstate_t state)
 
 	debug("%s", "init");
 
-	ttyfile = ttyname(STDERR_FILENO);   /* RATS: ignore (unimportant) */
+	ttyfile = ttyname(STDERR_FILENO);
 	if (!ttyfile) {
 		debug("%s: %s",
 		      "disabling cursor positioning because ttyname failed",
@@ -348,11 +363,11 @@ void pv_crs_init(pvstate_t state)
 		return;
 	}
 
-	fd = open(ttyfile, O_RDWR);	    /* RATS: ignore (no race) */
+	fd = open(ttyfile, O_RDWR);
 	if (fd < 0) {
-		fprintf(stderr, "%s: %s: %s\n",
-			state->program_name,
-			_("failed to open terminal"), strerror(errno));
+		pv_error(state, "%s: %s: %s",
+			 _("failed to open terminal"), ttyfile,
+			 strerror(errno));
 		state->cursor = 0;
 		return;
 	}
@@ -445,7 +460,7 @@ void pv_crs_reinit(pvstate_t state)
  */
 void pv_crs_update(pvstate_t state, char *str)
 {
-	char pos[32];			 /* RATS: ignore (checked OK) */
+	char pos[32];
 	int y;
 
 #ifdef HAVE_IPC
@@ -520,8 +535,8 @@ void pv_crs_update(pvstate_t state, char *str)
 
 	pv_crs_lock(state, STDERR_FILENO);
 
-	write(STDERR_FILENO, pos, strlen(pos));	/* RATS: ignore */
-	write(STDERR_FILENO, str, strlen(str));	/* RATS: ignore */
+	write(STDERR_FILENO, pos, strlen(pos));
+	write(STDERR_FILENO, str, strlen(str));
 
 	pv_crs_unlock(state, STDERR_FILENO);
 }
@@ -532,7 +547,7 @@ void pv_crs_update(pvstate_t state, char *str)
  */
 void pv_crs_fini(pvstate_t state)
 {
-	char pos[32];			 /* RATS: ignore (checked OK) */
+	char pos[32];
 	int y;
 
 	debug("%s", "fini");
@@ -553,11 +568,11 @@ void pv_crs_fini(pvstate_t state)
 	if ((y < 1) || (y > 999999))
 		y = 1;
 
-	sprintf(pos, "\033[%d;1H\n", y);    /* RATS: ignore */
+	sprintf(pos, "\033[%d;1H\n", y);
 
 	pv_crs_lock(state, STDERR_FILENO);
 
-	write(STDERR_FILENO, pos, strlen(pos));	/* RATS: ignore */
+	write(STDERR_FILENO, pos, strlen(pos));
 
 #ifdef HAVE_IPC
 	pv_crs_ipccount(state);

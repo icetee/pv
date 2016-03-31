@@ -1,19 +1,37 @@
 /*
  * Display functions.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "pv-internal.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 #include <time.h>
 #include <unistd.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+
+
+/*
+ * Output an error message.  If we've displayed anything to the terminal
+ * already, then put a newline before our error so we don't write over what
+ * we've written.
+ */
+void pv_error(pvstate_t state, char *format, ...)
+{
+	va_list ap;
+	if (state->display_visible)
+		fprintf(stderr, "\n");
+	fprintf(stderr, "%s: ", state->program_name);
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
+}
 
 
 /*
@@ -72,35 +90,46 @@ static long pv__calc_eta(const long long so_far, const long long total,
 
 /*
  * Given a long double value, it is divided or multiplied by the ratio until
- * a value in the range 1.0 to 999.999... is found. The string "prefix" to
+ * a value in the range 1.0 to 999.999... is found.  The string "prefix" to
  * is updated to the corresponding SI prefix.
  *
  * If "is_bytes" is 1, then the second byte of "prefix" is set to "i" to
- * denote MiB etc (IEEE1541). Thus "prefix" should be at least 3 bytes long
+ * denote MiB etc (IEEE1541).  Thus "prefix" should be at least 3 bytes long
  * (to include the terminating null).
  *
  * Submitted by Henry Gebhardt <hsggebhardt@googlemail.com> and then
- * modified. Further changed after input from Thomas Rachel.
+ * modified.  Further changed after input from Thomas Rachel; changed still
+ * further after Debian bug #706175.
  */
 static void pv__si_prefix(long double *value, char *prefix,
 			  const long double ratio, int is_bytes)
 {
-	static char *pfx = NULL;
-	static char const *pfx_middle = NULL;
+	static char *pfx_000 = NULL;	 /* kilo, mega, etc */
+	static char *pfx_024 = NULL;	 /* kibi, mibi, etc */
+	static char const *pfx_middle_000 = NULL;
+	static char const *pfx_middle_024 = NULL;
+	char *pfx;
+	char const *pfx_middle;
 	char const *i;
 	long double cutoff;
 
-	if (NULL == pfx) {
-		pfx = _("yzafpnum kMGTPEZY");
+	if (NULL == pfx_000) {
+		pfx_000 = _("yzafpnum kMGTPEZY");
+		pfx_middle_000 = strchr(pfx_000, ' ');
 	}
 
-	if (NULL == pfx_middle) {
-		/*
-		 * We can't assign this in the declaration above because
-		 * that wouldn't be constant, so we do it here.
-		 */
-		pfx_middle = strchr(pfx, ' ');
+	if (NULL == pfx_024) {
+		pfx_024 = _("yzafpnum KMGTPEZY");
+		pfx_middle_024 = strchr(pfx_024, ' ');
 	}
+
+	pfx = pfx_000;
+	pfx_middle = pfx_middle_000;
+	if (is_bytes) {
+		pfx = pfx_024;
+		pfx_middle = pfx_middle_024;
+	}
+
 	i = pfx_middle;
 
 	prefix[0] = ' ';		    /* Make the prefix start blank. */
@@ -146,8 +175,8 @@ static void pv__sizestr(char *buffer, int bufsize, char *format,
 			long double amount, char *suffix_basic,
 			char *suffix_bytes, int is_bytes)
 {
-	char sizestr_buffer[256];	 /* RATS: ignore (big enough) */
-	char si_prefix[8] = " ";	 /* RATS: ignore (big enough) */
+	char sizestr_buffer[256];
+	char si_prefix[8] = " ";
 	long double divider;
 	long double display_amount;
 	char *suffix;
@@ -177,9 +206,9 @@ static void pv__sizestr(char *buffer, int bufsize, char *format,
 		 * AIX blows up with %4.3Lg%.2s%.16s for some reason, so we
 		 * write display_amount separately first.
 		 */
-		char str_disp[64];	 /* RATS: ignore (OK) */
+		char str_disp[64];
 		sprintf(str_disp, "%4.3Lg", display_amount);
-		sprintf(sizestr_buffer, "%s%.2s%.16s" /* RATS: ignore */ ,
+		sprintf(sizestr_buffer, "%s%.2s%.16s",
 			str_disp, si_prefix, suffix);
 	}
 
@@ -214,8 +243,8 @@ static void pv__format_init(pvstate_t state)
 	}
 
 	formatstr =
-	    state->format_string ? state->
-	    format_string : state->default_format;
+	    state->format_string ? state->format_string : state->
+	    default_format;
 
 	state->components_used = 0;
 
@@ -244,7 +273,14 @@ static void pv__format_init(pvstate_t state)
 	for (strpos = 0; formatstr[strpos] != 0 && segment < 99;
 	     strpos++, segment++) {
 		if ('%' == formatstr[strpos]) {
+			int num;
 			strpos++;
+			num = 0;
+			while (isdigit(formatstr[strpos])) {
+				num = num * 10;
+				num += formatstr[strpos] - '0';
+				strpos++;
+			}
 			switch (formatstr[strpos]) {
 			case 'p':
 				state->format[segment].string =
@@ -265,6 +301,27 @@ static void pv__format_init(pvstate_t state)
 				state->format[segment].length = 0;
 				state->components_used |= PV_DISPLAY_ETA;
 				break;
+			case 'I':
+				state->format[segment].string =
+				    state->str_fineta;
+				state->format[segment].length = 0;
+				state->components_used |=
+				    PV_DISPLAY_FINETA;
+				break;
+			case 'A':
+				state->format[segment].string =
+				    state->str_lastoutput;
+				state->format[segment].length = 0;
+				if (num > sizeof(state->lastoutput_buffer))
+					num =
+					    sizeof
+					    (state->lastoutput_buffer);
+				if (num < 1)
+					num = 1;
+				state->lastoutput_length = num;
+				state->components_used |=
+				    PV_DISPLAY_OUTPUTBUF;
+				break;
 			case 'r':
 				state->format[segment].string =
 				    state->str_rate;
@@ -283,6 +340,13 @@ static void pv__format_init(pvstate_t state)
 				    state->str_transferred;
 				state->format[segment].length = 0;
 				state->components_used |= PV_DISPLAY_BYTES;
+				break;
+			case 'T':
+				state->format[segment].string =
+				    state->str_bufpercent;
+				state->format[segment].length = 0;
+				state->components_used |=
+				    PV_DISPLAY_BUFPERCENT;
 				break;
 			case 'N':
 				state->format[segment].string =
@@ -329,6 +393,15 @@ static void pv__format_init(pvstate_t state)
 
 	state->format[segment].string = 0;
 	state->format[segment].length = 0;
+}
+
+/*
+ * Return the original value x so that it has been clamped between
+ * [min..max]
+ */
+static long bound_long(long x, long min, long max)
+{
+	return x < min ? min : x > max ? max : x;
 }
 
 
@@ -402,7 +475,8 @@ static char *pv__format(pvstate_t state,
 		if (elapsed_sec < 0.000001)
 			elapsed_sec = 0.000001;
 		average_rate =
-		    ((long double) total_bytes) /
+		    (((long double) total_bytes) -
+		     ((long double) state->initial_offset)) /
 		    (long double) elapsed_sec;
 		if (bytes_since_last < 0)
 			rate = average_rate;
@@ -449,14 +523,13 @@ static char *pv__format(pvstate_t state,
 	if (NULL == state->display_buffer) {
 		state->display_buffer_size = (2 * state->width) + 80;
 		if (state->name)
-			state->display_buffer_size += strlen(state->name);	/* RATS: ignore */
+			state->display_buffer_size += strlen(state->name);
 		state->display_buffer =
 		    malloc(state->display_buffer_size + 16);
 		if (NULL == state->display_buffer) {
-			fprintf(stderr, "%s: %s: %s\n",
-				state->program_name,
-				_("buffer allocation failed"),
-				strerror(errno));
+			pv_error(state, "%s: %s",
+				 _("buffer allocation failed"),
+				 strerror(errno));
 			state->exit_status |= 64;
 			return NULL;
 		}
@@ -472,7 +545,7 @@ static char *pv__format(pvstate_t state,
 	 * of the percentage. (Or lines, if --lines was given with --bytes).
 	 */
 	if (state->numeric) {
-		char numericprefix[128]; /* RATS: ignore (OK) */
+		char numericprefix[128];
 
 		numericprefix[0] = 0;
 
@@ -502,11 +575,14 @@ static char *pv__format(pvstate_t state,
 	 */
 
 	state->str_transferred[0] = 0;
+	state->str_bufpercent[0] = 0;
 	state->str_timer[0] = 0;
 	state->str_rate[0] = 0;
 	state->str_average_rate[0] = 0;
 	state->str_progress[0] = 0;
+	state->str_lastoutput[0] = 0;
 	state->str_eta[0] = 0;
+	state->str_fineta[0] = 0;
 
 	/* If we're showing bytes transferred, set up the display string. */
 	if ((state->components_used & PV_DISPLAY_BYTES) != 0) {
@@ -514,6 +590,19 @@ static char *pv__format(pvstate_t state,
 			    sizeof(state->str_transferred), "%s",
 			    (long double) total_bytes, "", _("B"),
 			    state->linemode ? 0 : 1);
+	}
+
+	/* Transfer buffer percentage - set up the display string. */
+	if ((state->components_used & PV_DISPLAY_BUFPERCENT) != 0) {
+		if (state->buffer_size > 0)
+			sprintf(state->str_bufpercent, "{%3ld%%}",
+				pv__calc_percentage(state->read_position -
+						    state->write_position,
+						    state->buffer_size));
+#ifdef HAVE_SPLICE
+		if (state->splice_used)
+			strcpy(state->str_bufpercent, "{----}");
+#endif
 	}
 
 	/* Timer - set up the display string. */
@@ -547,23 +636,45 @@ static char *pv__format(pvstate_t state,
 			    state->linemode ? 0 : 1);
 	}
 
+	/* Last output bytes - set up the display string. */
+	if ((state->components_used & PV_DISPLAY_OUTPUTBUF) != 0) {
+		int idx;
+		for (idx = 0; idx < state->lastoutput_length; idx++) {
+			int c;
+			c = state->lastoutput_buffer[idx];
+			state->str_lastoutput[idx] = isprint(c) ? c : '.';
+		}
+		state->str_lastoutput[idx] = 0;
+	}
+
 	/* ETA (only if size is known) - set up the display string. */
 	if (((state->components_used & PV_DISPLAY_ETA) != 0)
 	    && (state->size > 0)) {
-		eta = pv__calc_eta(total_bytes, state->size, elapsed_sec);
-
-		if (eta < 0)
-			eta = 0;
+		eta =
+		    pv__calc_eta(total_bytes - state->initial_offset,
+				 state->size - state->initial_offset,
+				 elapsed_sec);
 
 		/*
 		 * Bounds check, so we don't overrun the suffix buffer. This
 		 * means the ETA will always be less than 100,000 hours.
 		 */
-		if (eta > (long) 360000000L)
-			eta = (long) 360000000L;
+		eta = bound_long(eta, 0, (long) 360000000L);
 
-		sprintf(state->str_eta, "%.16s %ld:%02ld:%02ld", _("ETA"),
-			eta / 3600, (eta / 60) % 60, eta % 60);
+		/*
+		 * If the ETA is more than a day, include a day count as
+		 * well as hours, minutes, and seconds.
+		 */
+		if (eta > 86400L) {
+			sprintf(state->str_eta,
+				"%.16s %ld:%02ld:%02ld:%02ld", _("ETA"),
+				eta / 86400, (eta / 3600) % 24,
+				(eta / 60) % 60, eta % 60);
+		} else {
+			sprintf(state->str_eta, "%.16s %ld:%02ld:%02ld",
+				_("ETA"), eta / 3600, (eta / 60) % 60,
+				eta % 60);
+		}
 
 		/*
 		 * If this is the final update, show a blank space where the
@@ -574,6 +685,68 @@ static char *pv__format(pvstate_t state,
 			for (i = 0; i < sizeof(state->str_eta)
 			     && state->str_eta[i] != 0; i++) {
 				state->str_eta[i] = ' ';
+			}
+		}
+	}
+
+	/* ETA as clock time (as above) - set up the display string. */
+	if (((state->components_used & PV_DISPLAY_FINETA) != 0)
+	    && (state->size > 0)) {
+		/*
+		 * The ETA may be hidden by a failed ETA string
+		 * generation.
+		 */
+		int show_eta = 1;
+		time_t now = time(NULL);
+		time_t then;
+		struct tm *time_ptr;
+		char *time_format = NULL;
+
+		eta =
+		    pv__calc_eta(total_bytes - state->initial_offset,
+				 state->size - state->initial_offset,
+				 elapsed_sec);
+
+		/*
+		 * Bounds check, so we don't overrun the suffix buffer. This
+		 * means the ETA will always be less than 100,000 hours.
+		 */
+		eta = bound_long(eta, 0, (long) 360000000L);
+
+		/*
+		 * Only include the date if the ETA is more than 6 hours
+		 * away.
+		 */
+		if (eta > (long) (6 * 3600)) {
+			time_format = "%Y-%m-%d %H:%M:%S";
+		} else {
+			time_format = "%H:%M:%S";
+		}
+
+		then = now + eta;
+		time_ptr = localtime(&then);
+
+		if (NULL == time_ptr) {
+			show_eta = 0;
+		} else {
+			/* Localtime keeps data stored in a
+			 * static buffer that gets overwritten
+			 * by time functions. */
+			struct tm time = *time_ptr;
+
+			sprintf(state->str_fineta, "%.16s ", _("ETA"));
+			strftime(state->str_fineta +
+				 strlen(state->str_fineta),
+				 sizeof(state->str_fineta) - 1 -
+				 strlen(state->str_fineta),
+				 time_format, &time);
+		}
+
+		if (!show_eta) {
+			int i;
+			for (i = 0; i < sizeof(state->str_fineta)
+			     && state->str_fineta[i] != 0; i++) {
+				state->str_fineta[i] = ' ';
 			}
 		}
 	}
@@ -602,7 +775,7 @@ static char *pv__format(pvstate_t state,
 	 * Assemble the progress bar now we know how big it should be.
 	 */
 	if ((state->components_used & PV_DISPLAY_PROGRESS) != 0) {
-		char pct[16];		 /* RATS: ignore (big enough) */
+		char pct[16];
 		int available_width, i;
 
 		strcpy(state->str_progress, "[");
@@ -641,7 +814,7 @@ static char *pv__format(pvstate_t state,
 				strcat(state->str_progress, " ");
 			}
 			strcat(state->str_progress, "] ");
-			strcat(state->str_progress, pct);	/* RATS: ignore (OK) */
+			strcat(state->str_progress, pct);
 		} else {
 			int p = state->percentage;
 
@@ -693,6 +866,9 @@ static char *pv__format(pvstate_t state,
 			segment_length =
 			    strlen(state->format[segment].string);
 		}
+		/* Skip empty segments */
+		if (segment_length == 0)
+			continue;
 		/*
 		 * Truncate segment if it would make the display string
 		 * overflow the buffer
@@ -707,7 +883,7 @@ static char *pv__format(pvstate_t state,
 		/* Skip segment if it would make the display too wide */
 		if (segment_length + display_string_length > state->width)
 			break;
-		strncat(state->display_buffer,	/* RATS: ignore */
+		strncat(state->display_buffer,
 			state->format[segment].string, segment_length);
 		display_string_length += segment_length;
 	}
@@ -719,7 +895,7 @@ static char *pv__format(pvstate_t state,
 	output_length = strlen(state->display_buffer);
 	if ((output_length < state->prev_length)
 	    && (state->width >= state->prev_width)) {
-		char spaces[32];	 /* RATS: ignore (bounded below) */
+		char spaces[32];
 		int spaces_to_add;
 		spaces_to_add = state->prev_length - output_length;
 		/* Upper boundary on number of spaces */
@@ -731,8 +907,7 @@ static char *pv__format(pvstate_t state,
 		while (--spaces_to_add >= 0) {
 			spaces[spaces_to_add] = ' ';
 		}
-		strcat(state->display_buffer,	/* RATS: ignore (OK) */
-		       spaces);
+		strcat(state->display_buffer, spaces);
 	}
 	state->prev_width = state->width;
 	state->prev_length = output_length;
@@ -776,13 +951,17 @@ void pv_display(pvstate_t state, long double esec, long long sl,
 		return;
 
 	if (state->numeric) {
-		write(STDERR_FILENO, display, strlen(display));	/* RATS: ignore */
+		write(STDERR_FILENO, display, strlen(display));
 	} else if (state->cursor) {
 		pv_crs_update(state, display);
+		state->display_visible = 1;
 	} else {
-		write(STDERR_FILENO, display, strlen(display));	/* RATS: ignore */
+		write(STDERR_FILENO, display, strlen(display));
 		write(STDERR_FILENO, "\r", 1);
+		state->display_visible = 1;
 	}
+
+	debug("%s: [%s]", "display", display);
 }
 
 /* EOF */

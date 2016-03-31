@@ -13,17 +13,10 @@ TESTS="$*"
 
 # Temporary working files
 #
-TMP1=.tmp1
-TMP2=.tmp2
-TMP3=.tmp3
-TMP4=.tmp4
-
-if which mktemp >/dev/null 2>&1; then
-	TMP1=`mktemp`
-	TMP2=`mktemp`
-	TMP3=`mktemp`
-	TMP4=`mktemp`
-fi
+TMP1=`mktemp 2>/dev/null` || TMP1=.tmp1
+TMP2=`mktemp 2>/dev/null` || TMP2=.tmp2
+TMP3=`mktemp 2>/dev/null` || TMP3=.tmp3
+TMP4=`mktemp 2>/dev/null` || TMP4=.tmp4
 
 export PROG TMP1 TMP2 TMP3 TMP4	# variables used by test scripts
 

@@ -1,7 +1,5 @@
 /*
  * Signal handling functions.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "pv-internal.h"
@@ -31,7 +29,7 @@ static void pv_sig_ttou(int s)
 {
 	int fd;
 
-	fd = open("/dev/null", O_RDWR);	    /* RATS: ignore (no race) */
+	fd = open("/dev/null", O_RDWR);
 	if (fd < 0)
 		return;
 

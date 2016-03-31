@@ -7,7 +7,7 @@
   index manhtml indent update-po \
   doc dist release \
   install uninstall \
-  rpmbuild rpm srpm
+  rpm srpm
 
 all: $(alltarg) $(CATALOGS)
 
@@ -83,7 +83,7 @@ update-po: $(srcdir)/src/nls/$(PACKAGE).pot
 
 distclean: clean depclean
 	rm -f $(alltarg) src/include/config.h
-	rm -rf $(package)-$(version).tar* $(package)-$(version)
+	rm -rf $(package)-$(version).tar* $(package)-$(version) $(package)-$(version)-*.rpm
 	rm -f *.html config.*
 	rm Makefile
 
@@ -132,7 +132,7 @@ dist: doc update-po
 	rm -rf DUMMY `find $(package)-$(version) -type d -name .svn`
 	tar cf $(package)-$(version).tar $(package)-$(version)
 	rm -rf $(package)-$(version)
-	$(DO_GZIP) $(package)-$(version).tar
+	-gzip -f9 $(package)-$(version).tar
 
 check test: $(alltarg)
 	sh $(srcdir)/autoconf/scripts/run-test.sh ./$(package) $(srcdir)
@@ -146,7 +146,6 @@ install: all doc
 	                  "$(DESTDIR)$(bindir)/$(package)"
 	$(INSTALL) -m 644 doc/quickref.1 \
 	                  "$(DESTDIR)$(mandir)/man1/$(package).1"
-	-$(DO_GZIP) "$(DESTDIR)$(mandir)/man1/$(package).1"
 	if test -n "$(CATALOGS)"; then \
 	  catalogs='$(CATALOGS)'; \
 	  for cat in $$catalogs; do \
@@ -182,32 +181,21 @@ uninstall:
 	  done; \
 	fi
 
-rpmbuild:
-	echo macrofiles: `rpm --showrc \
-	  | grep ^macrofiles \
-	  | cut -d : -f 2- \
-	  | sed 's,^[^/]*/,/,'`:`pwd`/rpmmacros > rpmrc
-	echo %_topdir `pwd`/rpm > rpmmacros
-	rm -rf rpm
-	mkdir rpm
-	mkdir rpm/SPECS rpm/BUILD rpm/SOURCES rpm/RPMS rpm/SRPMS
-	-cat /usr/lib/rpm/rpmrc /etc/rpmrc $$HOME/.rpmrc \
-	 | grep -hsv ^macrofiles \
-	 >> rpmrc
-
 rpm:
 	test -e $(package)-$(version).tar.gz || $(MAKE) dist
-	test -e rpmrc || $(MAKE) rpmbuild
-	rpmbuild $(RPMFLAGS) --rcfile=rpmrc -tb $(package)-$(version).tar.gz
+	rpmbuild $(RPMFLAGS) --define="%_topdir `pwd`/rpm" -tb $(package)-$(version).tar.gz
 	mv rpm/RPMS/*/$(package)-*.rpm .
-	rm -rf rpm rpmmacros rpmrc
+	rm -rf rpm
 
 srpm:
 	test -e $(package)-$(version).tar.gz || $(MAKE) dist
-	test -e rpmrc || $(MAKE) rpmbuild
-	rpmbuild $(RPMFLAGS) --rcfile=rpmrc -ts $(package)-$(version).tar.gz
+	rpmbuild $(RPMFLAGS) --define="%_topdir `pwd`/rpm" -ts $(package)-$(version).tar.gz
 	mv rpm/SRPMS/*$(package)-*.rpm .
-	rm -rf rpm rpmmacros rpmrc
+	rm -rf rpm
 
 release: dist rpm srpm
 	zcat $(package)-$(version).tar.gz | bzip2 > $(package)-$(version).tar.bz2
+	-grep -Fq '%_gpg_name' ~/.rpmmacros 2>/dev/null && rpm --addsign *.rpm
+	-gpg --list-secret-keys 2>&1 | grep -Fq 'uid' && gpg -ab *.tar.gz && rename .asc .txt *.tar.gz.asc
+	-gpg --list-secret-keys 2>&1 | grep -Fq 'uid' && gpg -ab *.tar.bz2 && rename .asc .txt *.tar.bz2.asc
+	chmod 644 $(package)-$(version)*

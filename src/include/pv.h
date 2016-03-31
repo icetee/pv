@@ -1,7 +1,5 @@
 /*
  * Functions used across the program.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #ifndef _PV_H
@@ -63,10 +61,13 @@ extern pvstate_t pv_state_alloc(const char *);
 /*
  * Set the formatting string, given a set of old-style formatting options.
  */
-extern void pv_state_set_format(pvstate_t, unsigned char progress,
-			 unsigned char timer, unsigned char eta,
-			 unsigned char rate, unsigned char average_rate,
-			 unsigned char bytes, const char *name);
+extern void pv_state_set_format(pvstate_t state, unsigned char progress,
+				unsigned char timer, unsigned char eta,
+				unsigned char fineta, unsigned char rate,
+				unsigned char average_rate, unsigned char bytes,
+				unsigned char bufpercent,
+				unsigned int lastwritten,
+				const char *name);
 
 /*
  * Set the various options.
@@ -75,18 +76,23 @@ extern void pv_state_force_set(pvstate_t, unsigned char);
 extern void pv_state_cursor_set(pvstate_t, unsigned char);
 extern void pv_state_numeric_set(pvstate_t, unsigned char);
 extern void pv_state_wait_set(pvstate_t, unsigned char);
+extern void pv_state_delay_start_set(pvstate_t, double);
 extern void pv_state_linemode_set(pvstate_t, unsigned char);
+extern void pv_state_null_set(pvstate_t, unsigned char);
 extern void pv_state_no_op_set(pvstate_t, unsigned char);
 extern void pv_state_skip_errors_set(pvstate_t, unsigned char);
 extern void pv_state_stop_at_size_set(pvstate_t, unsigned char);
 extern void pv_state_rate_limit_set(pvstate_t, unsigned long long);
 extern void pv_state_target_buffer_size_set(pvstate_t, unsigned long long);
+extern void pv_state_no_splice_set(pvstate_t, unsigned char);
 extern void pv_state_size_set(pvstate_t, unsigned long long);
 extern void pv_state_interval_set(pvstate_t, double);
 extern void pv_state_width_set(pvstate_t, unsigned int);
 extern void pv_state_height_set(pvstate_t, unsigned int);
 extern void pv_state_name_set(pvstate_t, const char *);
 extern void pv_state_format_string_set(pvstate_t, const char *);
+extern void pv_state_watch_pid_set(pvstate_t, unsigned int);
+extern void pv_state_watch_fd_set(pvstate_t, int);
 
 extern void pv_state_inputfiles(pvstate_t, int, const char **);
 
@@ -109,6 +115,16 @@ extern void pv_sig_init(pvstate_t);
  * Enter the main transfer loop, transferring all input files to the output.
  */
 extern int pv_main_loop(pvstate_t);
+
+/*
+ * Watch the selected file descriptor of the selected process.
+ */
+extern int pv_watchfd_loop(pvstate_t);
+
+/*
+ * Watch the selected process.
+ */
+extern int pv_watchpid_loop(pvstate_t);
 
 /*
  * Shut down signal handlers after running the main loop.

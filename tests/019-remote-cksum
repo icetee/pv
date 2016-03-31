@@ -25,15 +25,15 @@ set +e
 sleep 2
 for x in 1 2 3; do
 	$PROG -R `cat $TMP4` -apterb	|| exit 1
-	usleep 200000 || sleep 1
+	(usleep 200000 || sleep 1) 2>/dev/null
 	$PROG -R `cat $TMP4` -p		|| exit 1
-	usleep 200000 || sleep 1
+	(usleep 200000 || sleep 1) 2>/dev/null
 	$PROG -R `cat $TMP4` -N "test"	|| exit 1
-	usleep 200000 || sleep 1
+	(usleep 200000 || sleep 1) 2>/dev/null
 	$PROG -R `cat $TMP4` -F "%e"	|| exit 1
-	usleep 200000 || sleep 1
+	(usleep 200000 || sleep 1) 2>/dev/null
 	$PROG -R `cat $TMP4` -N "."	|| exit 1
-	usleep 200000 || sleep 1
+	(usleep 200000 || sleep 1) 2>/dev/null
 done
 $PROG -R `cat $TMP4` -L 10M
 echo OK > $TMP3

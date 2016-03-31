@@ -11,8 +11,6 @@
  * returns a struct msg_table_s[] of msgid and msgstr pairs, with the end
  * of the table being marked by a NULL msgid. The po2table.sh script will do
  * this.
- *
- * Copyright 2013 Andrew Wood, distributed under the Artistic License 2.0.
  */
 
 #include "config.h"
@@ -65,24 +63,24 @@ char *minigettext(char *msgid)
 		return msgid;
 
 	if (0 == tried_lang) {
-		lang = getenv("LANGUAGE");  /* RATS: ignore */
+		lang = getenv("LANGUAGE");
 		if (lang)
 			table = minigettext__gettable(lang);
 
 		if (NULL == table) {
-			lang = getenv("LANG");	/* RATS: ignore */
+			lang = getenv("LANG");
 			if (lang)
 				table = minigettext__gettable(lang);
 		}
 
 		if (NULL == table) {
-			lang = getenv("LC_ALL");	/* RATS: ignore */
+			lang = getenv("LC_ALL");
 			if (lang)
 				table = minigettext__gettable(lang);
 		}
 
 		if (NULL == table) {
-			lang = getenv("LC_MESSAGES");	/* RATS: ignore */
+			lang = getenv("LC_MESSAGES");
 			if (lang)
 				table = minigettext__gettable(lang);
 		}

@@ -1,4 +1,4 @@
-.TH @UCPACKAGE@ 1 "January 2013" Linux "User Manuals"
+.TH @UCPACKAGE@ 1 "March 2015" Linux "User Manuals"
 .SH NAME
 @PACKAGE@ \- monitor the progress of data through a pipe
 .SH SYNOPSIS
@@ -12,9 +12,9 @@
 
 .SH DESCRIPTION
 .B @PACKAGE@
-allows a user to see the progress of data through a pipeline, by giving
-information such as time elapsed, percentage completed (with progress bar),
-current throughput rate, total data transferred, and ETA.
+shows the progress of data through a pipeline by giving information such as
+time elapsed, percentage completed (with progress bar), current throughput
+rate, total data transferred, and ETA.
 
 To use it, insert it in a pipeline between two processes, with the
 appropriate options.  Its standard input will be passed through to its
@@ -85,6 +85,18 @@ will automatically stop at that size as if
 .B \-S
 had been given.
 
+(Linux only): Watching file descriptor 3 opened by another process 1234:
+
+.RS
+.B @PACKAGE@ -d 1234:3
+.RE
+
+(Linux only): Watching all file descriptors used by process 1234:
+
+.RS
+.B @PACKAGE@ -d 1234
+.RE
+
 
 .SH OPTIONS
 .B @PACKAGE@
@@ -120,6 +132,11 @@ transfer rates and the total data size, how long it will be before
 completion.  This option will have no effect if the total data size cannot
 be determined.
 .TP
+.B \-I, \-\-fineta
+Turn the ETA timer on, but display the estimated local time of arrival
+instead of time left.  When the estimated time is more than 6 hours in the
+future, the date is shown as well.
+.TP
 .B \-r, \-\-rate
 Turn the rate counter on.  This will display the current rate of data
 transfer.
@@ -132,6 +149,23 @@ data transfer so far.
 Turn the total byte counter on.  This will display the total amount of
 data transferred so far.
 .TP
+.B \-T, \-\-buffer\-percent
+Turn on the transfer buffer percentage display.  This will show the
+percentage of the transfer buffer in use - but see the caveat under
+.B %T
+in the
+.B FORMATTING
+section below.
+.TP
+.B \-A, \-\-last\-written NUM
+Show the last
+.B NUM
+bytes written - but see the caveat under
+.B %nA
+in the
+.B FORMATTING
+section below.
+.TP
 .B \-F, \-\-format FORMAT
 Ignore the options
 .BR \-p ,
@@ -139,8 +173,10 @@ Ignore the options
 .BR \-e ,
 .BR \-r ,
 .BR \-a ,
-and
 .BR \-b ,
+.BR \-T ,
+and
+.BR \-A ,
 and instead use the format string
 .B FORMAT
 to determine the output format.  See the
@@ -190,6 +226,13 @@ or
 .BR mcrypt (1)
 which require a passphrase before data can be processed.
 .TP
+.B \-D, \-\-delay-start SEC
+Wait until 
+.B SEC
+seconds have passed before showing any progress information, for example in
+a script where you only want to show a progress bar if it starts taking a
+long time.  Note that this can be a decimal such as 0.5.
+.TP
 .B \-s SIZE, \-\-size SIZE
 Assume the total amount of data to be transferred is
 .B SIZE
@@ -197,11 +240,22 @@ bytes when calculating percentages and ETAs.  The same suffixes of "k", "m"
 etc can be used as with
 .BR -L .
 .TP
+.B ""
+Has no effect if used with
+.B -d PID
+to watch all file descriptors of a process, but will work with
+.BR "-d PID:FD" .
+.TP
 .B \-l, \-\-line\-mode
 Instead of counting bytes, count lines (newline characters). The progress
 bar will only move when a new line is found, and the value passed to the
 .B \-s
-option will be interpreted as a line count.
+option will be interpreted as a line count.  Note that file sizes are not
+automatically calculated when this option is used, to avoid having to read
+all files twice.
+.TP
+.B \-0, \-\-null
+Count lines as null terminated.  This option implies \-\-line\-mode.
 .TP
 .B \-i SEC, \-\-interval SEC
 Wait
@@ -260,6 +314,31 @@ kilobytes (*1024), megabytes, and so on.  The default buffer size is the
 block size of the input file's filesystem multiplied by 32 (512kb max), or
 400kb if the block size cannot be determined.
 .TP
+.B \-C, \-\-no-splice
+Never use
+.BR splice (2),
+even if it would normally be possible.  The
+.BR splice (2)
+system call is a more efficient way of transferring data from or to a pipe
+than regular
+.BR read (2)
+and
+.BR write (2),
+but means that the transfer buffer may not be used.  This prevents
+.B \-A
+and
+.B \-T
+from working, so if you want to use
+.B \-A
+or
+.B \-T
+then you will need to use
+.BR \-C ,
+at the cost of a small loss in transfer efficiency.
+(This option has no effect on systems where
+.BR splice (2)
+is unavailable).
+.TP
 .B \-E, \-\-skip-errors
 Ignore read errors by attempting to skip past the offending sections.  The
 corresponding parts of the output will be null bytes.  At first only a few
@@ -280,6 +359,29 @@ If a size was specified with
 stop transferring data once that many bytes have been written, instead of
 continuing to the end of input.
 .TP
+.B \-d PID[:FD], \-\-watchfd PID[:FD]
+Instead of transferring data, watch file descriptor
+.B FD
+of process
+.BR PID ,
+and show its progress.  The
+.B @PACKAGE@
+process will exit when
+.B FD
+either changes to a different file, changes read/write mode, or is closed;
+other data transfer modifiers - and remote control - may not be used with
+this option.
+.TP
+.B ""
+If only a
+.B PID
+is specified, then that process will be watched, and all regular files and
+block devices it opens will be shown with a progress bar.  The
+.B @PACKAGE@
+process will exit when process
+.B PID
+exits.
+.TP
 .B \-R PID, \-\-remote PID
 If
 .B PID
@@ -297,6 +399,7 @@ Note that some options cannot be changed while running, such as
 .BR \-c ,
 .BR \-l ,
 .BR \-f ,
+.BR \-D ,
 .BR \-E ,
 and
 .BR \-S .
@@ -340,8 +443,12 @@ Elapsed time.  Equivalent to
 .BR \-t .
 .TP
 .B %e
-ETA.  Equivalent to
+ETA as time remaining.  Equivalent to
 .BR \-e .
+.TP
+.B %I
+ETA as local time of completion.  Equivalent to
+.BR \-I .
 .TP
 .B %r
 Current data transfer rate.  Equivalent to
@@ -357,6 +464,23 @@ Bytes transferred so far (or lines if
 was specified).  Equivalent to
 .BR \-b .
 .TP
+.B %T
+Percentage of the transfer buffer in use.  Equivalent to
+.BR \-T .
+Shows "{----}" if the transfer is being done with
+.BR splice (2),
+since splicing to or from pipes does not use the buffer.
+.TP
+.B %nA
+Show the last 
+.B n
+bytes written (e.g.
+.B %16A
+for the last 16 bytes).
+Shows only dots if the transfer is being done with
+.BR splice (2),
+since splicing to or from pipes does not use the buffer.
+.TP
 .B %N
 Name prefix given by
 .BR -N .
@@ -366,7 +490,7 @@ Padded to 9 characters with spaces, and suffixed with :.
 A single %.
 .P
 The format string equivalent of turning on all display switches is
-.BR "\`%N %b %t %r %a %p %e'" .
+.BR "\`%N %b %T %t %r %a %p %e'" .
 
 
 .SH EXIT STATUS
@@ -402,195 +526,14 @@ Memory allocation failed.
 A zero exit status indicates no problems.
 
 
-.SH AUTHORS
-Andrew Wood <andrew.wood@ivarch.com>
-.br
-.I http://www.ivarch.com/
+.SH AUTHOR
+Written by Andrew Wood, with patches submitted by various other people. 
+Please see the package README for a complete list of contributors.
 
-Kevin Coyner <kcoyner@debian.org>
-.br
-(Debian package maintainer)
 
-Jakub Hrozek <jhrozek@redhat.com>
-.br
-(Fedora package maintainer)
-
-Cedric Delfosse <cedric@debian.org>
-.br
-(previous Debian package maintainer)
-
-Eduardo Aguiar <eduardo.oliveira@sondabrasil.com.br>
-.br
-(provided Portuguese [Brazilian] translation)
-
-Stephane Lacasse <stephane@gorfou.ca>
-.br
-(provided French translation)
-.br
-.I http://gorfou.ca/
-
-Marcos Kreinacke <public@kreinacke.com>
-.br
-(provided German translation)
-
-Bartosz Fenski <fenio@o2.pl>
-.br
-(provided Polish translation, along with Krystian Zubel)
-.br
-.I http://skawina.eu.org/
-
-Joshua Jensen
-.br
-(reported RPM installation bug)
-
-Boris Folgmann
-.br
-(reported cursor handling bug)
-.br
-.I http://www.folgmann.com/en/
-
-Mathias Gumz
-.br
-(reported NLS bug)
-
-Daniel Roethlisberger
-.br
-(submitted patch to use lockfiles for -c if terminal locking fails)
-
-Adam Buchbinder
-.br
-(lots of help with a Cygwin port of -c)
-
-Mark Tomich
-.br
-(suggested -B option)
-.br
-.I http://metuchen.dyndns.org
-
-Gert Menke
-.br
-(reported bug when piping to dd with a large input buffer size)
-
-Ville Herva <Ville.Herva@iki.fi>
-.br
-(informative bug report about rate limiting performance)
-
-Elias Pipping
-.br
-(patch to compile properly on Darwin 9; potential NULL deref report)
-
-Patrick Collison
-.br
-(similar patch for OS X)
-
-Boris Lohner
-.br
-(reported problem that -L does not complain if given non-numeric value)
-
-Sebastian Kayser
-.br
-(supplied testing for SIGPIPE, demonstrated internationalisation problem)
-
-Laszlo Ersek
-.br
-(reported shared memory leak on SIGINT with -c)
-.br
-.I http://phptest11.atw.hu/
-
-Phil Rutschman
-.br
-(provided a patch for fully restoring terminal state on exit)
-.br
-.I http://bandgap.rsnsoft.com/
-
-Henry Precheur
-.br
-(reporting and suggestions for --rate-limit bug when rate is under 10)
-.br
-.I http://henry.precheur.org/
-
-E. Rosten
-.br
-(supplied patch for block buffering in line mode)
-.br
-.I http://mi.eng.cam.ac.uk/~er258/
-
-Kjetil Torgrim Homme
-.br
-(reported compilation error with default CFLAGS on non-GCC compilers)
-
-Alexandre de Verteuil
-.br
-(reported bug in OS X build and supplied test environment to fix in)
-
-Martin Baum
-.br
-(supplied patch to return nonzero exit status if terminated by signal)
-
-Sam Nelson
-.br
-(supplied patch to fix trailing slash on DESTDIR)
-.br
-.I http://www.siliconfuture.net/
-
-Daniel Pape
-.br
-(reported Cygwin installation problem due to DESTDIR)
-
-Henry Gebhardt <hsggebhardt@googlemail.com>
-.br
-(supplied patches to improve SI prefixes and add --average-rate)
-
-Vladimir Kokarev
-.br
-Alexander Leo
-.br
-(reported that exit status did not reflect file errors)
-
-Thomas Rachel
-.br
-(submitted patches for IEEE1541 (MiB suffixes), 1+e03 bug)
-
-Guillaume Marcais
-.br
-(submitted speedup patch for line mode)
-
-Moritz Barsnick
-.br
-(submitted patch for compile warning in size calculation)
-
-Pawel Piatek
-.br
-(submitted RPM and patches for AIX)
-
-Sami Liedes
-.br
-(submitted patch for --timer and --bytes with --numeric)
-
-Steven Willis
-.br
-(reported problem with "-R" killing non-@UCPACKAGE@ remote processes)
-
-Vladimir Pal, Vladimir Ermakov
-.br
-(submitted patch which led to development of --format option)
-
-Peter Samuelson <peter@p12n.org>
-.br
-(submitted patch to calculate size if stdout is a block device)
-
-Miguel Diaz
-.br
-(much Cygwin help (and packaging), found narrow-terminal bug)
-
-Jim Salter
-.br
-(commissioned work on the --skip-errors option)
-.br
-.I http://ubuntuwiki.net
-
-.SH BUGS
-Known bugs:
+.SH KNOWN PROBLEMS
+The following problems are known to exist in
+.BR @PACKAGE@ :
 .TP
 .B *
 The
@@ -615,13 +558,21 @@ before running the instance of
 .B @PACKAGE@
 you want, at runtime, to change the parameters of.
 .P
-If you find any other bugs, please contact the primary author, either by
-email or by using the contact form on the web site.
+If you find any other problems, please report them.
+
+
+.SH REPORTING BUGS
+Report bugs in
+.B @PACKAGE@
+to pv@ivarch.com or use the contact form linked from the
+.B @PACKAGE@
+home page: <http://www.ivarch.com/programs/pv.shtml>
 
 
 .SH "SEE ALSO"
 .BR cat (1),
-.BR dialog (1)
+.BR dialog (1),
+.BR splice (2)
 
 
 .SH LICENSE
