@@ -116,7 +116,7 @@ int pv_main_loop(pvstate_t state)
 	 * Set target buffer size if the initial file's block size can be
 	 * read and we weren't given a target buffer size.
 	 */
-	if (0 == fstat64(fd, &sb)) {
+	if ((0 == fstat64(fd, &sb)) && (0 == state->target_buffer_size)) {
 		unsigned long long sz;
 		sz = sb.st_blksize * 32;
 		if (sz > BUFFER_SIZE_MAX)
@@ -508,6 +508,7 @@ int pv_watchpid_loop(pvstate_t state)
 	struct timeval next_update, cur_time, next_remotecheck;
 	int idx;
 	int prev_displayed_lines, blank_lines;
+	int first_pass = 1;
 
 	/*
 	 * Make sure the process exists first, so we can give an error if
@@ -531,8 +532,8 @@ int pv_watchpid_loop(pvstate_t state)
 	 * it's not present.
 	 */
 	original_format_string =
-	    state->format_string ? state->format_string : state->
-	    default_format;
+	    state->format_string ? state->
+	    format_string : state->default_format;
 	if (NULL == strstr(original_format_string, "%N")) {
 		snprintf(new_format_string, sizeof(new_format_string) - 1,
 			 "%%N %s", original_format_string);
@@ -573,8 +574,20 @@ int pv_watchpid_loop(pvstate_t state)
 
 		gettimeofday(&cur_time, NULL);
 
-		if (kill(state->watch_pid, 0) != 0)
+		if (kill(state->watch_pid, 0) != 0) {
+			if (first_pass) {
+				pv_error(state, "%s %u: %s",
+					 _("pid"), state->watch_pid,
+					 strerror(errno));
+				state->exit_status |= 2;
+				if (NULL != info_array)
+					free(info_array);
+				if (NULL != state_array)
+					free(state_array);
+				return 2;
+			}
 			break;
+		}
 
 		if ((cur_time.tv_sec < next_update.tv_sec)
 		    || (cur_time.tv_sec == next_update.tv_sec
@@ -613,9 +626,22 @@ int pv_watchpid_loop(pvstate_t state)
 					 state->watch_pid, &array_length,
 					 &info_array, &state_array,
 					 fd_to_idx);
-		if (rc != 0)
+		if (rc != 0) {
+			if (first_pass) {
+				pv_error(state, "%s %u: %s",
+					 _("pid"), state->watch_pid,
+					 strerror(errno));
+				state->exit_status |= 2;
+				if (NULL != info_array)
+					free(info_array);
+				if (NULL != state_array)
+					free(state_array);
+				return 2;
+			}
 			break;
+		}
 
+		first_pass = 0;
 		displayed_lines = 0;
 
 		for (fd = 0; fd < FD_SETSIZE; fd++) {

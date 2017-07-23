@@ -1,21 +1,34 @@
 Things still to do:
 
-  - (#1505) option to switch rate to per minute if really slow
-  - (#1477) make 13GB be shown as 13.0GB so it's the same width as 13.1GB
+  - allow -E to take a block size argument so errors cause a skip to the
+    next block (Anthony DeRobertis)
+  - (#1559) momentary ETA option (Luc Gommans)
+  - (#1556) correct German translations (Richard Fonfara)
+  - (#1557) use clock_gettime() in ETA calculation (Mateju Miroslav)
+  - (#1561) show days in same format in ETA as in elapsed time
+  - (#1562) allow -r with -l and -n to output lines/sec (Roland Kletzing)
+  - (#1563) make -B imply -C (Johannes Gerer)
+  - document zsh <() incompatibility (frederik@ofb.net - Frederik Eaton)
+  - do not check terminal in -q/-n mode (zsh <(pv -n) fails)
+  - if -w/-H was specified, ignore SIGWINCH
+  - option to enable O_DIRECT (Romain Kang, Jacek Wielemborek)
+  - use posix_fadvise() like cat(1) does (Jacek Wielemborek)
   - (#1508) add watchfd tests
+  - (#1534) allow multiple -d options
+  - (#1533) one-shot option (Jacek Wielemborek)
+  - (#1505) option to switch rate to per minute if really slow
   - (#1510) option "--progress-from FILE", read last number and use it as bytes read:
     pv --progress-from <( while sleep 1; do du -sb somedir; done ) -s 123g
     (Jacek Wielemborek)
   - (#1476) (Debian #507682) adjustable averaging window for rate display
-  - (#1293) check transfer buffer usage on large memory systems
   - (#1286) option for process title (Martin Sarsale) as "pv - name:FooProcess -xyz - transferred: 1.3GB - 500KB/s - running: 10:15:30s"
   - (#1290) look at effect of O_SYNC or fsync on performance
   - (#1281) option (-x?) to use xterm title line for status (Joachim Haga)
   - (#1287) if the first pv exits, should the second become IPC leader?
+  - (#1560) use Unicode for more granular progress bar (Alexander Petrossian)
 
   - add development support for http://clang-analyzer.llvm.org/
   - stats for avg/min/max/stddev throughput (Venky.N.Iyer)
-  - option to enable O_DIRECT (Romain Kang)
   - pv-ify a command line (Will Entriken) - "pv FOO | BAR | BAZ"
   - get more translations
 

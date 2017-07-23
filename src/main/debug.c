@@ -31,14 +31,14 @@ void debugging_output(const char *function, const char *file, int line,
 	struct tm *tm;
 	char tbuf[128];
 
-	if (tried_open == 0) {
+	if (0 == tried_open) {
 		debugfile = getenv("DEBUG");
-		if (debugfile != NULL)
+		if (NULL != debugfile)
 			debugfptr = fopen(debugfile, "a");
 		tried_open = 1;
 	}
 
-	if (debugfptr == NULL)
+	if (NULL == debugfptr)
 		return;
 
 	time(&t);

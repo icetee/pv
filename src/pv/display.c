@@ -207,7 +207,8 @@ static void pv__sizestr(char *buffer, int bufsize, char *format,
 		 * write display_amount separately first.
 		 */
 		char str_disp[64];
-		sprintf(str_disp, "%4.3Lg", display_amount);
+		/* # to get 13.0GB instead of 13GB (#1477) */
+		sprintf(str_disp, "%#4.3Lg", display_amount);
 		sprintf(sizestr_buffer, "%s%.2s%.16s",
 			str_disp, si_prefix, suffix);
 	}
@@ -243,8 +244,8 @@ static void pv__format_init(pvstate_t state)
 	}
 
 	formatstr =
-	    state->format_string ? state->format_string : state->
-	    default_format;
+	    state->format_string ? state->
+	    format_string : state->default_format;
 
 	state->components_used = 0;
 

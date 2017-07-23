@@ -1,4 +1,4 @@
-.TH @UCPACKAGE@ 1 "March 2015" Linux "User Manuals"
+.TH @UCPACKAGE@ 1 "June 2017" Linux "User Manuals"
 .SH NAME
 @PACKAGE@ \- monitor the progress of data through a pipe
 .SH SYNOPSIS
@@ -303,16 +303,16 @@ invocations in a single, long, pipeline.
 .B \-L RATE, \-\-rate-limit RATE
 Limit the transfer to a maximum of
 .B RATE
-bytes per second.  A suffix of "k", "m", "g", or "t" can be added to denote
-kilobytes (*1024), megabytes, and so on.
+bytes per second.  A suffix of "K", "M", "G", or "T" can be added to denote
+kibibytes (*1024), mebibytes, and so on.
 .TP
 .B \-B BYTES, \-\-buffer-size BYTES
 Use a transfer buffer size of
 .B BYTES
-bytes.  A suffix of "k", "m", "g", or "t" can be added to denote
-kilobytes (*1024), megabytes, and so on.  The default buffer size is the
-block size of the input file's filesystem multiplied by 32 (512kb max), or
-400kb if the block size cannot be determined.
+bytes.  A suffix of "K", "M", "G", or "T" can be added to denote
+kibibytes (*1024), mebibytes, and so on.  The default buffer size is the
+block size of the input file's filesystem multiplied by 32 (512KiB max), or
+400KiB if the block size cannot be determined.
 .TP
 .B \-C, \-\-no-splice
 Never use
@@ -391,10 +391,10 @@ that is already running,
 .B \-R PID
 will cause that instance to act as though it had been given
 this instance's command line instead.  For example, if
-.B @PACKAGE@ -L 123k
+.B @PACKAGE@ -L 123K
 is running with process ID 9876, then running
-.B @PACKAGE@ -R 9876 -L 321k
-will cause it to start using a rate limit of 321k instead of 123k.
+.B @PACKAGE@ -R 9876 -L 321K
+will cause it to start using a rate limit of 321KiB instead of 123KiB.
 Note that some options cannot be changed while running, such as
 .BR \-c ,
 .BR \-l ,
@@ -491,6 +491,27 @@ A single %.
 .P
 The format string equivalent of turning on all display switches is
 .BR "\`%N %b %T %t %r %a %p %e'" .
+
+
+.SH COMMON SWITCHES
+Some suggested common switch combinations:
+
+.TP
+.B @PACKAGE@ -ptebar
+Show a progress bar, elapsed time, estimated completion time, byte counter,
+average rate, and current rate.
+.TP
+.B @PACKAGE@ -betlap
+Show a progress bar, elapsed time, estimated completion time, line counter,
+and average rate, counting lines instead of bytes.
+.TP
+.B @PACKAGE@ -t
+Show only the elapsed time - useful as a simple timer, e.g.
+.BR "sleep 10m | pv -t" .
+.TP
+.B @PACKAGE@ -pterb
+The default behaviour: progress bar, elapsed time, estimated completion
+time, current rate, and byte counter.
 
 
 .SH EXIT STATUS

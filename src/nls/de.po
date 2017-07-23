@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-15 00:37+0000\n"
+"POT-Creation-Date: 2017-06-30 22:21+0100\n"
 "Content-Type: text/plain; charset=iso-8859-15\n"
 "Date: 1999-06-01 15:18:29+0100\n"
 "From: Andrew Wood <ivarch@ubik>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "compat.c\n"
 
 #: src/pv/watchpid.c:51 src/pv/watchpid.c:66 src/pv/watchpid.c:76
-#: src/pv/watchpid.c:107 src/pv/loop.c:518
+#: src/pv/watchpid.c:107 src/pv/loop.c:519 src/pv/loop.c:580 src/pv/loop.c:632
 msgid "pid"
 msgstr ""
 
@@ -83,52 +83,52 @@ msgstr ""
 msgid "yzafpnum KMGTPEZY"
 msgstr ""
 
-#: src/pv/display.c:531 src/pv/transfer.c:612
+#: src/pv/display.c:532 src/pv/transfer.c:679
 msgid "buffer allocation failed"
 msgstr "Puffer konnte nicht allokiert werden"
 
-#: src/pv/display.c:591 src/pv/transfer.c:391
+#: src/pv/display.c:592 src/pv/transfer.c:458
 msgid "B"
 msgstr "B"
 
-#: src/pv/display.c:627 src/pv/display.c:635
+#: src/pv/display.c:628 src/pv/display.c:636
 msgid "/s"
 msgstr ""
 
-#: src/pv/display.c:627 src/pv/display.c:635
+#: src/pv/display.c:628 src/pv/display.c:636
 msgid "B/s"
 msgstr ""
 
-#: src/pv/display.c:670 src/pv/display.c:675 src/pv/display.c:737
+#: src/pv/display.c:671 src/pv/display.c:676 src/pv/display.c:738
 msgid "ETA"
 msgstr "ETA"
 
-#: src/pv/transfer.c:274
+#: src/pv/transfer.c:341
 msgid "read failed"
 msgstr "read-Aufruf fehlgeschlagen"
 
-#: src/pv/transfer.c:292
+#: src/pv/transfer.c:359
 msgid "warning: read errors detected"
 msgstr ""
 
-#: src/pv/transfer.c:307
+#: src/pv/transfer.c:374
 msgid "file is not seekable"
 msgstr ""
 
-#: src/pv/transfer.c:370
+#: src/pv/transfer.c:437
 #, fuzzy
 msgid "failed to seek past error"
 msgstr "Dateiinformationen konnten nicht gelesen werden"
 
-#: src/pv/transfer.c:389
+#: src/pv/transfer.c:456
 msgid "skipped past read error"
 msgstr ""
 
-#: src/pv/transfer.c:564
+#: src/pv/transfer.c:631
 msgid "write failed"
 msgstr "write-Aufruf fehlgeschlagen"
 
-#: src/pv/transfer.c:703
+#: src/pv/transfer.c:770
 msgid "select call failed"
 msgstr "select-Aufruf fehlgeschlagen"
 

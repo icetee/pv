@@ -229,6 +229,14 @@ Erkki Seppälä <http://www.inside.org/~flux/>
 
 ####News
 
+1.6.6 - 30 June 2017
+	(r161) use %llu instead of %Lu for better compatibility (Eric A. Borisch)
+	(r162) (#1532) fix target buffer size (-B) being ignored (AndCycle, Ilya Basin, Antoine Beaupré)
+	(r164) cap read/write sizes, and check elapsed time during read/write cycles, to avoid display hangs with large buffers or slow media; also remove select() call from repeated_write function as it slows the transfer down and the wrapping alarm() means it is unnecessary
+	(r169) (#1477) use alternate form for transfer counter, such that 13GB is shown as 13.0GB so it's the same width as 13.1GB (André Stapf)
+	(r171) cleanup: units corrections in man page, of the form kb -> KiB
+	(r175) report error in "-d" if process fd directory is unreadable, or if process disappears before we start the main loop (Jacek Wielemborek)
+
 1.6.0 - 15 March 2015
 
 	fix lstat64 support when unavailable - separate patches supplied by Ganael Laplanche and Peter Korsgaard

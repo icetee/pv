@@ -1,7 +1,7 @@
 Begin3
 Title:		pv
-Version:	1.6.0
-Entered-date:	15MAR15
+Version:	1.6.6
+Entered-date:	30JUN17
 Description:	A tool for monitoring the progress of data through a
 		pipeline.  It can be inserted into any normal pipeline
 		between two processes to give a visual indication of how

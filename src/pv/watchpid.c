@@ -157,7 +157,7 @@ long long pv_watchfd_position(pvwatchfd_t info)
 	if (NULL == fptr)
 		return -1;
 	position = -1;
-	fscanf(fptr, "pos: %Lu", &position);
+	fscanf(fptr, "pos: %llu", &position);
 	fclose(fptr);
 
 	return position;

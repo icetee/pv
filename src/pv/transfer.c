@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/time.h>
 
 
 /*
@@ -23,17 +24,28 @@
  * Unlike read(), if we have read less than "count" bytes, we check to see
  * if there's any more to read, and keep trying, to make sure we fill the
  * buffer as full as we can.
+ *
+ * We stop retrying if the time elapsed since this function was entered
+ * reaches TRANSFER_READ_TIMEOUT microseconds.
  */
 static ssize_t pv__transfer_read_repeated(int fd, void *buf, size_t count)
 {
+	struct timeval start_time;
 	ssize_t total_read;
+
+	gettimeofday(&start_time, NULL);
 
 	total_read = 0;
 
 	while (count > 0) {
 		ssize_t nread;
+		struct timeval now;
+		long elapsed_usec;
 
-		nread = read(fd, buf, count);
+		nread =
+		    read(fd, buf,
+			 count >
+			 MAX_READ_AT_ONCE ? MAX_READ_AT_ONCE : count);
 		if (nread < 0)
 			return nread;
 
@@ -43,6 +55,17 @@ static ssize_t pv__transfer_read_repeated(int fd, void *buf, size_t count)
 
 		if (0 == nread)
 			return total_read;
+
+		gettimeofday(&now, NULL);
+		elapsed_usec =
+		    1000000 * (now.tv_sec - start_time.tv_sec) +
+		    (now.tv_usec - start_time.tv_usec);
+		if (elapsed_usec > TRANSFER_READ_TIMEOUT) {
+			debug("%s %d: %s (%ld %s)", "fd", fd,
+			      "stopping read - timer expired",
+			      elapsed_usec, "usec elapsed");
+			return total_read;
+		}
 
 		if (count > 0) {
 			fd_set readfds;
@@ -73,19 +96,44 @@ static ssize_t pv__transfer_read_repeated(int fd, void *buf, size_t count)
  * Unlike write(), if we have written less than "count" bytes, we check to
  * see if we can write any more, and keep trying, to make sure we empty the
  * buffer as much as we can.
+ *
+ * We stop retrying if the time elapsed since this function was entered
+ * reaches TRANSFER_WRITE_TIMEOUT microseconds.
  */
 static ssize_t pv__transfer_write_repeated(int fd, void *buf, size_t count)
 {
+	struct timeval start_time;
 	ssize_t total_written;
+
+	gettimeofday(&start_time, NULL);
 
 	total_written = 0;
 
 	while (count > 0) {
 		ssize_t nwritten;
+		struct timeval now;
+		long elapsed_usec;
+		size_t asked_to_write;
 
-		nwritten = write(fd, buf, count);
-		if (nwritten < 0)
-			return nwritten;
+		asked_to_write = count >
+		    MAX_WRITE_AT_ONCE ? MAX_WRITE_AT_ONCE : count;
+
+		nwritten = write(fd, buf, asked_to_write);
+		if (nwritten < 0) {
+			if ((EINTR == errno) || (EAGAIN == errno)) {
+				/*
+				 * Interrupted by a signal - probably our
+				 * alarm() - so just return what we've
+				 * written so far.
+				 */
+				return total_written;
+			} else {
+				/*
+				 * Legitimate error - return negative.
+				 */
+				return nwritten;
+			}
+		}
 
 		total_written += nwritten;
 		buf += nwritten;
@@ -94,6 +142,23 @@ static ssize_t pv__transfer_write_repeated(int fd, void *buf, size_t count)
 		if (0 == nwritten)
 			return total_written;
 
+		gettimeofday(&now, NULL);
+		elapsed_usec =
+		    1000000 * (now.tv_sec - start_time.tv_sec) +
+		    (now.tv_usec - start_time.tv_usec);
+		if (elapsed_usec > TRANSFER_WRITE_TIMEOUT) {
+			debug("%s %d: %s (%ld %s)", "fd", fd,
+			      "stopping write - timer expired",
+			      elapsed_usec, "usec elapsed");
+			return total_written;
+		}
+
+		/*
+		 * Running the select() here seems to make PV eat a lot of
+		 * CPU in some cases, so instead we just go round the loop
+		 * again and rely on our alarm() to interrupt us if we run
+		 * out of time - also on our gettimeofday() check.
+		 */
 		if (count > 0) {
 			fd_set writefds;
 			struct timeval tv;
@@ -107,8 +172,10 @@ static ssize_t pv__transfer_write_repeated(int fd, void *buf, size_t count)
 			      "trying another write after partial buffer flush",
 			      nwritten, "written", count, "remaining");
 
+# if 0					    /* disabled after 1.6.0 - see comment above */
 			if (select(fd + 1, NULL, &writefds, NULL, &tv) < 1)
 				break;
+# endif
 		}
 	}
 
