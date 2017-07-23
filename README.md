@@ -229,7 +229,8 @@ Erkki Seppälä <http://www.inside.org/~flux/>
 
 ####News
 
-1.6.6 - 30 June 2017
+1.6.6 - 30 June 2017  
+
 	(r161) use %llu instead of %Lu for better compatibility (Eric A. Borisch)
 	(r162) (#1532) fix target buffer size (-B) being ignored (AndCycle, Ilya Basin, Antoine Beaupré)
 	(r164) cap read/write sizes, and check elapsed time during read/write cycles, to avoid display hangs with large buffers or slow media; also remove select() call from repeated_write function as it slows the transfer down and the wrapping alarm() means it is unnecessary
