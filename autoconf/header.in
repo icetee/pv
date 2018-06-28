@@ -71,6 +71,7 @@
 #   define fstat64 fstat
 #   define lstat64 lstat
 #  endif
+# elif (defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__))
 # else
 #  define stat64 stat
 #  define fstat64 fstat
