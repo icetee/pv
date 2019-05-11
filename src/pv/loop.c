@@ -145,7 +145,15 @@ int pv_main_loop(pvstate_t state)
 		if (state->pv_sig_abort)
 			break;
 
-		if (state->rate_limit > 0) {
+		if (0 < state->unlimited_rate_until) {
+			/*
+			 * If we're supposed to limit but not until a certain number of
+			 * bytes have been transferred, then don't transfer a chunk larger
+			 * than what should be transferred before rate limited kicks in
+			 * so we can come back here and compute rate limiting parameters
+			 */
+			cansend = state->unlimited_rate_until;
+		} else if (state->rate_limit > 0) {
 			gettimeofday(&cur_time, NULL);
 			if ((cur_time.tv_sec > next_ratecheck.tv_sec)
 			    || (cur_time.tv_sec == next_ratecheck.tv_sec
@@ -168,7 +176,7 @@ int pv_main_loop(pvstate_t state)
 		if ((0 < state->size) && (state->stop_at_size)) {
 			if ((state->size < (total_written + cansend))
 			    || ((0 == cansend)
-				&& (0 == state->rate_limit))) {
+				&& (0 >= state->unlimited_rate_until && 0 == state->rate_limit))) {
 				cansend = state->size - total_written;
 				if (0 >= cansend) {
 					eof_in = 1;
@@ -195,13 +203,17 @@ int pv_main_loop(pvstate_t state)
 		if (state->linemode) {
 			since_last += lineswritten;
 			total_written += lineswritten;
-			if (state->rate_limit > 0)
+			if (0 >= state->unlimited_rate_until && state->rate_limit > 0)
 				target -= lineswritten;
 		} else {
 			since_last += written;
 			total_written += written;
-			if (state->rate_limit > 0)
+			if (0 >= state->unlimited_rate_until && state->rate_limit > 0)
 				target -= written;
+		}
+
+		if (state->unlimited_rate_until > 0) {
+			state->unlimited_rate_until -= written;
 		}
 
 		if (eof_in && eof_out && n < (state->input_file_count - 1)) {

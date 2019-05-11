@@ -228,4 +228,7 @@ Credit is also due to:
   Eric A. Borisch
     - provided details of compatibility fix for "%Lu" in watchpid code
 
+  Davy Durham
+	- implemented "-U" / "--unlimited-rate-until" option
+
 -----------------------------------------------------------------------------

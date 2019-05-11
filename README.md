@@ -227,7 +227,13 @@ Michiel Van Herwegen
 Erkki Seppälä <http://www.inside.org/~flux/>
 - provided patch implementing "-I"
 
+Davy Durham
+- implemented "-U" / "--unlimited-rate-until" option
+
 ####News
+
+1.7.0 - ?
+	new option "-U" / "--unlimited-rate-until" to disable rate limiting until a given number of bytes have been transferred first, allowing for an initial burst of data.
 
 1.6.6 - 30 June 2017  
 

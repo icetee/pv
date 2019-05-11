@@ -83,6 +83,7 @@ extern void pv_state_no_op_set(pvstate_t, unsigned char);
 extern void pv_state_skip_errors_set(pvstate_t, unsigned char);
 extern void pv_state_stop_at_size_set(pvstate_t, unsigned char);
 extern void pv_state_rate_limit_set(pvstate_t, unsigned long long);
+extern void pv_state_unlimited_rate_until_set(pvstate_t, unsigned long long);
 extern void pv_state_target_buffer_size_set(pvstate_t, unsigned long long);
 extern void pv_state_no_splice_set(pvstate_t, unsigned char);
 extern void pv_state_size_set(pvstate_t, unsigned long long);

@@ -154,6 +154,11 @@ void pv_state_rate_limit_set(pvstate_t state, unsigned long long val)
 	state->rate_limit = val;
 };
 
+void pv_state_unlimited_rate_until_set(pvstate_t state, unsigned long long val)
+{
+	state->unlimited_rate_until = val;
+};
+
 void pv_state_target_buffer_size_set(pvstate_t state,
 				     unsigned long long val)
 {

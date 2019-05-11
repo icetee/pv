@@ -69,6 +69,7 @@ struct pvstate_s {
 	unsigned char stop_at_size;      /* set if we stop at "size" bytes */
 	unsigned char no_splice;         /* never use splice() */
 	unsigned long long rate_limit;   /* rate limit, in bytes per second */
+	unsigned long long unlimited_rate_until; /* don't limit the rate until this many bytes have been transferred */
 	unsigned long long target_buffer_size;  /* buffer size (0=default) */
 	unsigned long long size;         /* total size of data */
 	double interval;                 /* interval between updates */
