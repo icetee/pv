@@ -78,6 +78,8 @@ void display_help(void)
 		{"", 0, 0, 0},
 		{"-L", "--rate-limit", N_("RATE"),
 		 N_("limit transfer to RATE bytes per second")},
+		{"-U", "--unlimited-rate-until", N_("BYTES"),
+		 N_("do not start limiting transfer rate until BYTES have been transferred")},
 		{"-B", "--buffer-size", N_("BYTES"),
 		 N_("use a buffer size of BYTES")},
 		{"-C", "--no-splice", 0,

@@ -35,6 +35,7 @@ struct remote_msg {
 	unsigned char bufpercent;	 /* transfer buffer percentage flag */
 	unsigned int lastwritten;	 /* last-written bytes count */
 	unsigned long long rate_limit;	 /* rate limit, in bytes per second */
+	unsigned long long unlimited_rate_until;	 /* don't limit the rate until this many bytes have been transferred */
 	unsigned long long buffer_size;	 /* buffer size, in bytes (0=default) */
 	unsigned long long size;	 /* total size of data */
 	double interval;		 /* interval between updates */
@@ -139,6 +140,7 @@ int pv_remote_set(opts_t opts)
 	msgbuf.bufpercent = opts->bufpercent;
 	msgbuf.lastwritten = opts->lastwritten;
 	msgbuf.rate_limit = opts->rate_limit;
+	msgbuf.unlimited_rate_until = opts->unlimited_rate_until;
 	msgbuf.buffer_size = opts->buffer_size;
 	msgbuf.size = opts->size;
 	msgbuf.interval = opts->interval;
@@ -266,6 +268,8 @@ void pv_remote_check(pvstate_t state)
 
 	if (msgbuf.rate_limit > 0)
 		pv_state_rate_limit_set(state, msgbuf.rate_limit);
+	if (msgbuf.unlimited_rate_until > 0)
+		pv_state_unlimited_rate_until_set(state, msgbuf.unlimited_rate_until);
 	if (msgbuf.buffer_size > 0) {
 		pv_state_target_buffer_size_set(state, msgbuf.buffer_size);
 	}

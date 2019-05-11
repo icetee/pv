@@ -73,6 +73,7 @@ opts_t opts_parse(int argc, char **argv)
 		{"name", 1, 0, 'N'},
 		{"format", 1, 0, 'F'},
 		{"rate-limit", 1, 0, 'L'},
+		{"unlimited-rate-until", 1, 0, 'U'},
 		{"buffer-size", 1, 0, 'B'},
 		{"no-splice", 0, 0, 'C'},
 		{"skip-errors", 0, 0, 'E'},
@@ -85,7 +86,7 @@ opts_t opts_parse(int argc, char **argv)
 	int option_index = 0;
 #endif
 	char *short_options =
-	    "hVpteIrabTA:fnqcWD:s:l0i:w:H:N:F:L:B:CESR:P:d:";
+	    "hVpteIrabTA:fnqcWD:s:l0i:w:H:N:F:L:U:B:CESR:P:d:";
 	int c, numopts;
 	unsigned int check_pid;
 	int check_fd;
@@ -145,6 +146,7 @@ opts_t opts_parse(int argc, char **argv)
 		case 'w':
 		case 'H':
 		case 'L':
+		case 'U':
 		case 'B':
 		case 'R':
 			if (pv_getnum_check(optarg, PV_NUMTYPE_INTEGER) !=
@@ -283,6 +285,9 @@ opts_t opts_parse(int argc, char **argv)
 			break;
 		case 'L':
 			opts->rate_limit = pv_getnum_ll(optarg);
+			break;
+		case 'U':
+			opts->unlimited_rate_until = pv_getnum_ll(optarg);
 			break;
 		case 'B':
 			opts->buffer_size = pv_getnum_ll(optarg);

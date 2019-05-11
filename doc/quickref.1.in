@@ -306,6 +306,12 @@ Limit the transfer to a maximum of
 bytes per second.  A suffix of "K", "M", "G", or "T" can be added to denote
 kibibytes (*1024), mebibytes, and so on.
 .TP
+.B \-U BYTES, \-\-unlimited-rate-until BYTES
+Do not limit the rate of transfer until
+.B BYTES
+bytes have been initially transferred.  A suffix of "K", "M", "G", or "T" can
+be added to denote kibibytes (*1024), mebibytes, and so on.
+.TP
 .B \-B BYTES, \-\-buffer-size BYTES
 Use a transfer buffer size of
 .B BYTES

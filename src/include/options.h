@@ -32,6 +32,7 @@ struct opts_s {           /* structure describing run-time options */
 	unsigned char null;            /* lines are null-terminated */
 	unsigned char no_op;           /* do nothing other than pipe data */
 	unsigned long long rate_limit; /* rate limit, in bytes per second */
+	unsigned long long unlimited_rate_until; /* don't limit the rate until this many bytes have been transferred */
 	unsigned long long buffer_size;/* buffer size, in bytes (0=default) */
 	unsigned int remote;           /* PID of pv to update settings of */
 	unsigned long long size;       /* total size of data */

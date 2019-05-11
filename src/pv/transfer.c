@@ -231,7 +231,7 @@ static int pv__transfer_read(pvstate_t state, int fd,
 	if ((!state->linemode) && (!state->no_splice)
 	    && (fd != state->splice_failed_fd)
 	    && (0 == state->to_write)) {
-		if (state->rate_limit || allowed != 0)
+		if ((0 >= state->unlimited_rate_until && state->rate_limit) || allowed != 0)
 			bytes_to_splice = allowed;
 		else
 			bytes_to_splice = bytes_can_read;
@@ -737,7 +737,7 @@ long pv_transfer(pvstate_t state, int fd, int *eof_in, int *eof_out,
 	 * write.
 	 */
 	state->to_write = state->read_position - state->write_position;
-	if ((state->rate_limit > 0) || (allowed > 0)) {
+	if ((0 >= state->unlimited_rate_until && state->rate_limit > 0) || (allowed > 0)) {
 		if (state->to_write > allowed) {
 			state->to_write = allowed;
 		}
