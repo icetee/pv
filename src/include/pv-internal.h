@@ -13,6 +13,20 @@
 #include "pv.h"
 #endif /* _PV_H */
 
+#ifdef __APPLE__
+// Mac OS with the Apple Silicon (big sur) removed the following deprecated types:
+// stat64, fstat64, lstat64
+// Hence any code referencing these types will fail to compile.
+// To walk around this issue, use `stat, fstat, lstat` instead.
+// They are 64 bit types on all the recent Mac OS versions.
+// References:
+// https://trac.macports.org/ticket/62853
+// https://github.com/stenzek/duckstation/commit/152ccd591722369aaad2785083fb2ab789effbbe
+#define stat stat64
+#define fstat fstat64
+#define lstat lstat64
+#endif
+
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
